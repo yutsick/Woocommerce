@@ -219,3 +219,77 @@ require get_template_directory() . '/inc/template-tags.php';
  * Functions which enhance the theme by hooking into WordPress.
  */
 require get_template_directory() . '/inc/template-functions.php';
+
+/**
+ * Add WooCommerce support.
+ */
+function allmighty_add_woocommerce_support() {
+	add_theme_support( 'woocommerce' );
+	add_theme_support( 'wc-product-gallery-zoom' );
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	add_theme_support( 'wc-product-gallery-slider' );
+}
+add_action( 'after_setup_theme', 'allmighty_add_woocommerce_support' );
+
+/**
+ * Helper function to render ACF flexible content blocks.
+ *
+ * @param string $field_name The ACF flexible content field name.
+ */
+function allmighty_render_blocks( $field_name = 'content_blocks' ) {
+	if ( ! function_exists( 'have_rows' ) ) {
+		return;
+	}
+
+	if ( have_rows( $field_name ) ) :
+		while ( have_rows( $field_name ) ) :
+			the_row();
+			$layout = get_row_layout();
+			$template_file = get_template_directory() . '/template-parts/blocks/' . $layout . '.php';
+
+			if ( file_exists( $template_file ) ) {
+				include $template_file;
+			}
+		endwhile;
+	endif;
+}
+
+/**
+ * Get current language code (WPML/Polylang compatible).
+ *
+ * @return string Language code (e.g., 'en', 'uk').
+ */
+function allmighty_get_current_language() {
+	// WPML support
+	if ( function_exists( 'icl_get_current_language' ) ) {
+		return icl_get_current_language();
+	}
+
+	// Polylang support
+	if ( function_exists( 'pll_current_language' ) ) {
+		return pll_current_language();
+	}
+
+	// Default to site language
+	return substr( get_locale(), 0, 2 );
+}
+
+/**
+ * Get language switcher URL (WPML/Polylang compatible).
+ *
+ * @param string $lang_code Language code to switch to.
+ * @return string|false URL or false if not available.
+ */
+function allmighty_get_language_url( $lang_code ) {
+	// WPML support
+	if ( function_exists( 'icl_get_home_url' ) ) {
+		return icl_get_home_url() . '/' . $lang_code . '/';
+	}
+
+	// Polylang support
+	if ( function_exists( 'pll_home_url' ) ) {
+		return pll_home_url( $lang_code );
+	}
+
+	return false;
+}

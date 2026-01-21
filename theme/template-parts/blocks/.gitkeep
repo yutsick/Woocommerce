@@ -1,0 +1,31 @@
+# ACF Flexible Content Blocks
+
+This directory contains all ACF flexible content block templates.
+
+Each block should be named exactly as the ACF layout name (e.g., hero_section.php).
+
+## Block Structure
+
+Each block file should follow this structure:
+
+```php
+<?php
+/**
+ * Block: Block Name
+ *
+ * Description of what this block does.
+ */
+
+// Get ACF fields
+$field_name = get_sub_field('field_name');
+
+// Block markup
+?>
+<section class="block-name">
+    <!-- Your block HTML here -->
+</section>
+```
+
+## Usage
+
+Blocks are automatically rendered by the `allmighty_render_blocks()` function in page.php.

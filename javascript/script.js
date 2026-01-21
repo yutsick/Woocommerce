@@ -8,3 +8,33 @@
  * For esbuild documentation, please see:
  * https://esbuild.github.io/
  */
+
+// Mobile Menu Toggle
+document.addEventListener('DOMContentLoaded', function () {
+	const menuToggle = document.getElementById('mobile-menu-toggle');
+	const mobileMenu = document.getElementById('mobile-menu');
+
+	if (menuToggle && mobileMenu) {
+		menuToggle.addEventListener('click', function () {
+			mobileMenu.classList.toggle('hidden');
+			document.body.classList.toggle('overflow-hidden');
+		});
+
+		// Close menu when clicking on a link
+		const menuLinks = mobileMenu.querySelectorAll('a');
+		menuLinks.forEach((link) => {
+			link.addEventListener('click', function () {
+				mobileMenu.classList.add('hidden');
+				document.body.classList.remove('overflow-hidden');
+			});
+		});
+
+		// Close menu on escape key
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+				mobileMenu.classList.add('hidden');
+				document.body.classList.remove('overflow-hidden');
+			}
+		});
+	}
+});

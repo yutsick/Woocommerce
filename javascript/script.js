@@ -9,6 +9,10 @@
  * https://esbuild.github.io/
  */
 
+// Import Swiper
+import Swiper from 'swiper';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function () {
 	const menuToggle = document.getElementById('mobile-menu-toggle');
@@ -35,6 +39,25 @@ document.addEventListener('DOMContentLoaded', function () {
 				mobileMenu.classList.add('hidden');
 				document.body.classList.remove('overflow-hidden');
 			}
+		});
+	}
+
+	// Initialize Best Offers Swiper
+	const bestOffersSwiper = document.querySelector('.best-offers-swiper');
+	if (bestOffersSwiper) {
+		new Swiper('.best-offers-swiper', {
+			modules: [Navigation, Pagination, Autoplay],
+			slidesPerView: 1,
+			spaceBetween: 20,
+			loop: true,
+			autoplay: {
+				delay: 5000,
+				disableOnInteraction: false,
+			},
+			navigation: {
+				nextEl: '.swiper-button-next-custom',
+				prevEl: '.swiper-button-prev-custom',
+			},
 		});
 	}
 });

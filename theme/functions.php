@@ -144,7 +144,13 @@ add_action( 'widgets_init', 'allmighty_widgets_init' );
  * Enqueue scripts and styles.
  */
 function allmighty_scripts() {
-	wp_enqueue_style( 'allmighty-style', get_stylesheet_uri(), array(), ALLMIGHTY_VERSION );
+	// Swiper CSS
+	wp_enqueue_style( 'swiper', 'https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css', array(), '12.0.0' );
+
+	// Theme styles
+	wp_enqueue_style( 'allmighty-style', get_stylesheet_uri(), array( 'swiper' ), ALLMIGHTY_VERSION );
+
+	// Theme scripts
 	wp_enqueue_script( 'allmighty-script', get_template_directory_uri() . '/js/script.min.js', array(), ALLMIGHTY_VERSION, true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {

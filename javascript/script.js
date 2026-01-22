@@ -60,4 +60,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 		});
 	}
+
+	// Initialize Testimonials Swiper
+	const testimonialsSwiper = document.querySelector('.testimonials-swiper');
+	if (testimonialsSwiper) {
+		new Swiper('.testimonials-swiper', {
+			modules: [Navigation, Autoplay],
+			slidesPerView: 1,
+			spaceBetween: 20,
+			loop: true,
+			autoplay: {
+				delay: 6000,
+				disableOnInteraction: false,
+			},
+			navigation: {
+				nextEl: '.swiper-button-next-testimonials',
+				prevEl: '.swiper-button-prev-testimonials',
+			},
+		});
+	}
 });

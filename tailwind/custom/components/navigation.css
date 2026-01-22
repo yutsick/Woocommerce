@@ -54,3 +54,31 @@
 #primary-menu .sub-menu a {
 	@apply block px-4 py-2 hover:bg-[#5a5a5a];
 }
+
+/* Footer Menu */
+#footer-menu,
+#footer-menu-mobile {
+	@apply flex items-center gap-8;
+}
+
+#footer-menu li,
+#footer-menu-mobile li {
+	@apply list-none;
+}
+
+#footer-menu a,
+#footer-menu-mobile a {
+	@apply text-white font-medium text-base hover:text-gray-300 transition-colors no-underline;
+}
+
+#footer-menu .current-menu-item a,
+#footer-menu .current_page_item a,
+#footer-menu-mobile .current-menu-item a,
+#footer-menu-mobile .current_page_item a {
+	@apply text-gray-300;
+}
+
+/* Mobile footer menu specific styles */
+#footer-menu-mobile {
+	@apply flex-col text-lg;
+}

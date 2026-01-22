@@ -1,0 +1,116 @@
+/**
+ * Contact Form 7 Styles
+ */
+
+/* Form wrapper */
+.contact-form-wrapper {
+	@apply w-full;
+}
+
+/* Form fields container */
+.contact-form-wrapper .wpcf7-form {
+	@apply space-y-4;
+}
+
+/* Individual form field */
+.contact-form-wrapper .form-field {
+	@apply w-full;
+}
+
+/* Input fields (text, email, tel, etc.) */
+.contact-form-wrapper input[type='text'],
+.contact-form-wrapper input[type='email'],
+.contact-form-wrapper input[type='tel'],
+.contact-form-wrapper input[type='url'],
+.contact-form-wrapper input[type='number'] {
+	@apply w-full px-6 py-4 bg-gray-50 border-0 rounded-lg text-gray-600 placeholder-gray-400;
+	@apply text-base;
+	@apply transition-colors duration-200;
+	@apply focus:outline-none focus:ring-2 focus:ring-gray-300 focus:bg-white;
+}
+
+/* Textarea */
+.contact-form-wrapper textarea {
+	@apply w-full px-6 py-4 bg-gray-50 border-0 rounded-lg text-gray-600 placeholder-gray-400;
+	@apply text-base min-h-[150px] resize-y;
+	@apply transition-colors duration-200;
+	@apply focus:outline-none focus:ring-2 focus:ring-gray-300 focus:bg-white;
+}
+
+/* Checkbox container */
+.contact-form-wrapper .form-checkbox,
+.contact-form-wrapper .wpcf7-acceptance {
+	@apply flex items-start gap-3 my-6;
+}
+
+/* Checkbox input */
+.contact-form-wrapper input[type='checkbox'] {
+	@apply mt-1 w-5 h-5 text-[#3a3a3a] bg-gray-100 border-gray-300 rounded;
+	@apply focus:ring-2 focus:ring-gray-300;
+	@apply cursor-pointer;
+}
+
+/* Checkbox label */
+.contact-form-wrapper .form-checkbox label,
+.contact-form-wrapper .wpcf7-list-item-label {
+	@apply text-gray-600 text-sm cursor-pointer;
+}
+
+/* Submit button */
+.contact-form-wrapper input[type='submit'],
+.contact-form-wrapper .wpcf7-submit {
+	@apply w-full bg-[#3a3a3a] text-white px-8 py-4 rounded-lg;
+	@apply text-lg font-medium;
+	@apply transition-colors duration-200;
+	@apply hover:bg-[#2a2a2a] cursor-pointer;
+	@apply focus:outline-none focus:ring-2 focus:ring-gray-500;
+}
+
+/* Submit button container */
+.contact-form-wrapper .form-submit {
+	@apply mt-6;
+}
+
+/* Validation errors */
+.contact-form-wrapper .wpcf7-not-valid-tip {
+	@apply text-red-500 text-sm mt-2;
+}
+
+/* Error messages */
+.contact-form-wrapper .wpcf7-response-output {
+	@apply border-2 p-4 rounded-lg mt-4 text-sm;
+}
+
+.contact-form-wrapper .wpcf7-validation-errors {
+	@apply border-red-500 bg-red-50 text-red-700;
+}
+
+.contact-form-wrapper .wpcf7-mail-sent-ok {
+	@apply border-green-500 bg-green-50 text-green-700;
+}
+
+/* Loading spinner */
+.contact-form-wrapper .wpcf7-spinner {
+	@apply ml-2;
+}
+
+/* Remove default CF7 styles */
+.contact-form-wrapper .wpcf7-form-control-wrap {
+	@apply block w-full;
+}
+
+/* List items (for radio/checkbox groups) */
+.contact-form-wrapper .wpcf7-list-item {
+	@apply flex items-center gap-2 mb-2;
+}
+
+/* Remove margins from CF7 defaults */
+.contact-form-wrapper .wpcf7-form p {
+	@apply m-0;
+}
+
+/* Placeholder styling */
+.contact-form-wrapper input::placeholder,
+.contact-form-wrapper textarea::placeholder {
+	@apply text-gray-400;
+}

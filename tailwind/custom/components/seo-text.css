@@ -1,0 +1,22 @@
+/**
+ * SEO Text Block Styles
+ */
+
+.seo-text-content {
+	position: relative;
+}
+
+/* Smooth transition for height changes */
+.seo-text-content {
+	transition: max-height 0.5s ease-in-out;
+}
+
+/* Fade overlay gradient */
+.fade-overlay {
+	transition: opacity 0.5s ease-in-out;
+}
+
+/* Remove default prose margins for better control */
+.seo-text-content .prose p:last-child {
+	@apply mb-0;
+}

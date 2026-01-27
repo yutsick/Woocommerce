@@ -307,3 +307,82 @@ function allmighty_get_language_url( $lang_code ) {
 
 	return false;
 }
+
+/**
+ * WooCommerce: Modify product query for custom filters.
+ *
+ * @param WP_Query $query The main query.
+ */
+function allmighty_filter_products_query( $query ) {
+	if ( ! is_admin() && $query->is_main_query() && ( is_shop() || is_product_category() ) ) {
+		$tax_query = $query->get( 'tax_query' ) ?: array();
+
+		// Filter by size attribute
+		if ( ! empty( $_GET['filter_size'] ) ) {
+			$sizes = array_map( 'sanitize_text_field', (array) $_GET['filter_size'] );
+			$tax_query[] = array(
+				'taxonomy' => 'pa_size',
+				'field'    => 'slug',
+				'terms'    => $sizes,
+				'operator' => 'IN',
+			);
+		}
+
+		// Filter by color attribute
+		if ( ! empty( $_GET['filter_color'] ) ) {
+			$colors = array_map( 'sanitize_text_field', (array) $_GET['filter_color'] );
+			$tax_query[] = array(
+				'taxonomy' => 'pa_color',
+				'field'    => 'slug',
+				'terms'    => $colors,
+				'operator' => 'IN',
+			);
+		}
+
+		if ( ! empty( $tax_query ) ) {
+			$tax_query['relation'] = 'AND';
+			$query->set( 'tax_query', $tax_query );
+		}
+	}
+}
+add_action( 'pre_get_posts', 'allmighty_filter_products_query' );
+
+/**
+ * WooCommerce: Set products per page.
+ *
+ * @param int $cols Number of products per page.
+ * @return int
+ */
+function allmighty_products_per_page( $cols ) {
+	return 12;
+}
+add_filter( 'loop_shop_per_page', 'allmighty_products_per_page' );
+
+/**
+ * Yoast SEO: Custom breadcrumb separator.
+ *
+ * @param string $separator The separator.
+ * @return string
+ */
+function allmighty_yoast_breadcrumb_separator( $separator ) {
+	return ' / ';
+}
+add_filter( 'wpseo_breadcrumb_separator', 'allmighty_yoast_breadcrumb_separator' );
+
+/**
+ * ACF: Add options page for shop settings.
+ */
+function allmighty_acf_options_page() {
+	if ( function_exists( 'acf_add_options_page' ) ) {
+		acf_add_options_page( array(
+			'page_title' => __( 'Shop Settings', 'allmighty' ),
+			'menu_title' => __( 'Shop Settings', 'allmighty' ),
+			'menu_slug'  => 'shop-settings',
+			'capability' => 'edit_posts',
+			'redirect'   => false,
+			'icon_url'   => 'dashicons-cart',
+			'position'   => 30,
+		) );
+	}
+}
+add_action( 'acf/init', 'allmighty_acf_options_page' );

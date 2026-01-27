@@ -13,7 +13,7 @@
 
 	</div><!-- #content -->
 
-	<?php get_template_part( 'template-parts/layout/footer', 'content', ["is_logo" => true]  ); ?>
+	<?php get_template_part( 'template-parts/layout/footer', 'content', ["is_logo" => false] ); ?>
 
 </div><!-- #page -->
 

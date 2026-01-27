@@ -31,23 +31,27 @@ if ( $image ) {
 }
 ?>
 
-<section class="contact-form-block py-16 lg:py-0 bg-gray-100">
+<section class="contact-form-block py-16 lg:py-0 ">
 	<div class="container mx-auto px-4 lg:px-0">
 		<!-- Desktop Layout -->
-		<div class="hidden lg:flex lg:items-stretch">
+		<div class="hidden lg:flex lg:items-stretch relative">
 			<!-- Image (Left Side - 60%) -->
 			<div class="lg:w-3/5 relative">
 				<div class="h-full">
 					<img src="<?php echo esc_url( $image_url ); ?>"
 					     alt="<?php echo esc_attr( $title ); ?>"
-					     class="w-full h-full object-cover">
+					     class="w-full">
 				</div>
 			</div>
 
 			<!-- Form (Right Side - 40%) -->
-			<div class="lg:w-2/5 bg-white flex items-center">
-				<div class="w-full px-12 py-16">
-					<?php get_template_part( 'template-parts/blocks/partials/contact-form-template' ); ?>
+			<div class="lg:w-2/5 bg-gray-100 flex items-center absolute -top-16 right-0">
+				<div class="w-full p-6 lg:p-12">
+					<?php get_template_part( 'template-parts/blocks/partials/contact-form-template' ,null, 
+					array(
+						'title'    => $title,
+						'subtitle' => $subtitle
+					)); ?>
 				</div>
 			</div>
 		</div>
@@ -59,13 +63,17 @@ if ( $image ) {
 				<div class="aspect-video">
 					<img src="<?php echo esc_url( $image_url ); ?>"
 					     alt="<?php echo esc_attr( $title ); ?>"
-					     class="w-full h-full object-cover">
+					     class="w-full">
 				</div>
 			</div>
 
 			<!-- Form Card -->
-			<div class="bg-white rounded-t-3xl -mt-8 relative z-10 px-6 py-8">
-				<?php get_template_part( 'template-parts/blocks/partials/contact-form-template' ); ?>
+			<div class="bg-gray-100 rounded-t-3xl -mt-8 relative z-10 px-6 py-8">
+				<?php get_template_part( 'template-parts/blocks/partials/contact-form-template',null, 
+				array(
+					'title'    => $title,
+					'subtitle' => $subtitle
+				) ); ?>
 			</div>
 		</div>
 	</div>

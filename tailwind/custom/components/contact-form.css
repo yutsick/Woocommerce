@@ -40,7 +40,7 @@
 /* Checkbox container */
 .contact-form-wrapper .form-checkbox,
 .contact-form-wrapper .wpcf7-acceptance {
-	@apply flex items-start gap-3 my-6;
+	@apply flex items-start gap-3;
 }
 
 /* Checkbox input */
@@ -95,9 +95,11 @@
 }
 
 /* Remove default CF7 styles */
-.contact-form-wrapper .wpcf7-form-control-wrap {
+.contact-form-wrapper .wpcf7-form-control-wrap:not[data-name="acceptance-terms"] {
 	@apply block w-full;
 }
+
+
 
 /* List items (for radio/checkbox groups) */
 .contact-form-wrapper .wpcf7-list-item {

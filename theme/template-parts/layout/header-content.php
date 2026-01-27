@@ -33,9 +33,11 @@ $cart_count   = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 
 				<!-- Center: Logo -->
 				<div class="flex-shrink-0 mx-8">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="block" rel="home">
-						<img src="https://placehold.co/120x80/3a3a3a/ffffff?text=LOGO" alt="<?php bloginfo( 'name' ); ?>" class="h-16 w-auto">
-					</a>
+					<?php 
+						if ( function_exists( 'the_custom_logo' ) ) {
+							the_custom_logo();
+						}
+						?>
 				</div>
 
 				<!-- Right: Language, Cart, Phone -->
@@ -86,10 +88,11 @@ $cart_count   = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 					</svg>
 				</button>
 
-				<!-- Logo -->
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="block" rel="home">
-					<img src="https://placehold.co/100x60/3a3a3a/ffffff?text=LOGO" alt="<?php bloginfo( 'name' ); ?>" class="h-12 w-auto">
-				</a>
+			<?php 
+						if ( function_exists( 'the_custom_logo' ) ) {
+							the_custom_logo();
+						}
+						?>
 
 				<!-- Cart Icon -->
 				<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="relative p-3 bg-[#4a4a4a] rounded-lg hover:bg-[#5a5a5a] transition-colors">

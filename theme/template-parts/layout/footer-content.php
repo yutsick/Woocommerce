@@ -9,15 +9,16 @@
 
 // Get current year for copyright
 $current_year = gmdate( 'Y' );
+$is_logo = !empty($args['is_logo']) ? $args['is_logo'] : false;
 ?>
 
-<footer id="colophon" class="bg-[#3a3a3a] text-white">
+<footer id="colophon" class="bg-[#3a3a3a] text-white lg:min-h-[285px]">
 	<!-- Main Footer Content -->
 	<div class="container mx-auto px-4 py-12">
 		<!-- Desktop Layout -->
 		<div class="hidden lg:flex lg:items-center lg:justify-between">
 			<!-- Left: Contact Info -->
-			<div class="lg:w-1/3">
+			<div class="lg:w-3/5">
 				<h3 class="text-2xl font-bold mb-6">Contact Us</h3>
 				<div class="space-y-3">
 					<a href="tel:+1234567890" class="block text-lg hover:text-gray-300 transition-colors">
@@ -52,29 +53,33 @@ $current_year = gmdate( 'Y' );
 						</svg>
 					</a>
 				</div>
+				<nav class="flex mt-8" aria-label="<?php esc_attr_e( 'Footer Menu', 'allmighty' ); ?>">
+						<?php
+
+						wp_nav_menu(
+							array(
+								'theme_location' => 'menu-2',
+								'menu_id'        => 'footer-menu',
+								'container'      => false,
+								'menu_class'     => 'flex gap-8',
+								'fallback_cb'    => false,
+							)
+						);
+						?>
+					</nav>
 			</div>
 
 			<!-- Center: Footer Menu -->
-			<nav class="lg:w-1/3 flex justify-center" aria-label="<?php esc_attr_e( 'Footer Menu', 'allmighty' ); ?>">
-				<?php
-				wp_nav_menu(
-					array(
-						'theme_location' => 'menu-1',
-						'menu_id'        => 'footer-menu',
-						'container'      => false,
-						'menu_class'     => 'flex items-center gap-8',
-						'fallback_cb'    => false,
-					)
-				);
-				?>
-			</nav>
+
 
 			<!-- Right: Logo -->
-			<div class="lg:w-1/3 flex justify-end">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
-					<img src="https://placehold.co/150x100/3a3a3a/ffffff?text=LOGO" alt="<?php bloginfo( 'name' ); ?>" class="h-20 w-auto">
-				</a>
-			</div>
+			 <?php if ($is_logo) { ?>
+				<div class="lg:w-1/3 flex justify-end">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
+						<img src="https://placehold.co/150x100/3a3a3a/ffffff?text=LOGO" alt="<?php bloginfo( 'name' ); ?>" class="h-20 w-auto">
+					</a>
+				</div>
+			<?php } ?>
 		</div>
 
 		<!-- Mobile Layout -->

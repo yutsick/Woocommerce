@@ -70,4 +70,10 @@ get_header();
 	</main><!-- #main -->
 
 <?php
-get_footer();
+if (is_front_page() || is_page('contacts')){
+	get_footer('form');
+} else {
+	get_footer();	
+}
+
+

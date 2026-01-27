@@ -114,6 +114,14 @@ if ( ! function_exists( 'allmighty_setup' ) ) :
 		// Add support for responsive embedded content.
 		add_theme_support( 'responsive-embeds' );
 
+		add_theme_support( 'custom-logo', array(
+        'height'      => 100,
+        'width'       => 400,
+        'flex-height' => true, 
+        'flex-width'  => true,  
+        'header-text' => array( 'site-title', 'site-description' ),
+    ) );
+
 		// Remove support for block templates.
 		remove_theme_support( 'block-templates' );
 	}

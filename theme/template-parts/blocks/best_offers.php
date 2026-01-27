@@ -59,12 +59,14 @@ if ( empty( $products ) ) {
 
 		<!-- Desktop Grid -->
 		<div class="hidden lg:grid lg:grid-cols-3 gap-8">
-			<?php foreach ( $products as $product ) : ?>
+	
+			<?php foreach ( $products as $product_item ) : ?>
 				<?php
-				if ( is_numeric( $product ) ) {
-					$product = wc_get_product( $product );
-				}
-				if ( ! $product ) {
+			
+				$p_id = is_numeric( $product_item ) ? $product_item : $product_item->ID;					
+
+				$product = wc_get_product( $p_id );
+				if ( ! is_a( $product, 'WC_Product' ) ) {
 					continue;
 				}
 				?>
@@ -111,12 +113,14 @@ if ( empty( $products ) ) {
 		<div class="lg:hidden">
 			<div class="swiper best-offers-swiper">
 				<div class="swiper-wrapper">
-					<?php foreach ( $products as $product ) : ?>
+					<?php foreach ( $products as $product_item ) : ?>
 						<?php
-						if ( is_numeric( $product ) ) {
-							$product = wc_get_product( $product );
-						}
-						if ( ! $product ) {
+					
+							$p_id = is_numeric( $product_item ) ? $product_item : $product_item->ID;					
+
+				$product = wc_get_product( $p_id );
+						
+						if ( ! is_a( $product, 'WC_Product' ) ) {
 							continue;
 						}
 						?>

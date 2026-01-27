@@ -235,6 +235,11 @@ require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 
 /**
+ * AJAX Shop Handler for products catalog.
+ */
+require get_template_directory() . '/inc/ajax-shop-handler.php';
+
+/**
  * Add WooCommerce support.
  */
 function allmighty_add_woocommerce_support() {
@@ -244,6 +249,23 @@ function allmighty_add_woocommerce_support() {
 	add_theme_support( 'wc-product-gallery-slider' );
 }
 add_action( 'after_setup_theme', 'allmighty_add_woocommerce_support' );
+
+/**
+ * Use custom template for WooCommerce shop page.
+ *
+ * @param string $template The template path.
+ * @return string
+ */
+function allmighty_custom_shop_template( $template ) {
+	if ( is_shop() || is_product_category() ) {
+		$custom_template = get_template_directory() . '/page-shop.php';
+		if ( file_exists( $custom_template ) ) {
+			return $custom_template;
+		}
+	}
+	return $template;
+}
+add_filter( 'template_include', 'allmighty_custom_shop_template', 99 );
 
 /**
  * Helper function to render ACF flexible content blocks.
@@ -317,6 +339,17 @@ function allmighty_filter_products_query( $query ) {
 	if ( ! is_admin() && $query->is_main_query() && ( is_shop() || is_product_category() ) ) {
 		$tax_query = $query->get( 'tax_query' ) ?: array();
 
+		// Filter by product categories (custom filter, not the default product_cat)
+		if ( ! empty( $_GET['product_categories'] ) ) {
+			$categories = array_map( 'sanitize_text_field', (array) $_GET['product_categories'] );
+			$tax_query[] = array(
+				'taxonomy' => 'product_cat',
+				'field'    => 'slug',
+				'terms'    => $categories,
+				'operator' => 'IN',
+			);
+		}
+
 		// Filter by size attribute
 		if ( ! empty( $_GET['filter_size'] ) ) {
 			$sizes = array_map( 'sanitize_text_field', (array) $_GET['filter_size'] );
@@ -386,3 +419,19 @@ function allmighty_acf_options_page() {
 	}
 }
 add_action( 'acf/init', 'allmighty_acf_options_page' );
+
+/**
+ * Fix product_cat array issue: WordPress expects a string, not an array.
+ * This handles URLs with product_cat[] from old filter forms.
+ *
+ * @param array $query_vars The query variables.
+ * @return array
+ */
+function allmighty_fix_product_cat_array( $query_vars ) {
+	if ( isset( $query_vars['product_cat'] ) && is_array( $query_vars['product_cat'] ) ) {
+		// Remove array value to prevent fatal error
+		unset( $query_vars['product_cat'] );
+	}
+	return $query_vars;
+}
+add_filter( 'request', 'allmighty_fix_product_cat_array', 1 );

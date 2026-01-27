@@ -17,39 +17,43 @@ $is_shop          = is_shop();
 $is_category      = is_product_category();
 
 // Get all product categories for the filter
-$product_categories = get_terms( array(
+$categories = get_terms( array(
 	'taxonomy'   => 'product_cat',
 	'hide_empty' => true,
 	'parent'     => 0,
 ) );
 
 // Get product attributes for filters
-$size_attribute  = wc_get_attribute_taxonomy_id( 'size' );
-$color_attribute = wc_get_attribute_taxonomy_id( 'color' );
+$size_taxonomy  = 'pa_size'; 
+$color_taxonomy = 'pa_color';
 
 // Get sizes
 $sizes = get_terms( array(
-	'taxonomy'   => 'pa_size',
+	'taxonomy'   => $size_taxonomy,
 	'hide_empty' => true,
 ) );
 
 // Get colors
 $colors = get_terms( array(
-	'taxonomy'   => 'pa_color',
+	'taxonomy'   => $color_taxonomy,
 	'hide_empty' => true,
 ) );
 
 // Current filters from URL
-$current_sort     = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
-$current_category_filter = isset( $_GET['product_cat'] ) ? sanitize_text_field( $_GET['product_cat'] ) : '';
-$current_sizes    = isset( $_GET['filter_size'] ) ? array_map( 'sanitize_text_field', (array) $_GET['filter_size'] ) : array();
-$current_colors   = isset( $_GET['filter_color'] ) ? array_map( 'sanitize_text_field', (array) $_GET['filter_color'] ) : array();
+$current_sort = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
+
+$current_categories = isset( $_GET['product_categories'] ) ? array_map( 'sanitize_text_field', (array) $_GET['product_categories'] ) : array();
+
+$current_sizes = isset( $_GET['filter_size'] ) ? array_map( 'sanitize_text_field', (array) $_GET['filter_size'] ) : array();
+
+$current_colors = isset( $_GET['filter_color'] ) ? array_map( 'sanitize_text_field', (array) $_GET['filter_color'] ) : array();
+
 
 // Sort options
 $sort_options = array(
-	'date'       => __( 'New arrivals', 'allmighty' ),
-	'price-desc' => __( 'Price from higher', 'allmighty' ),
-	'price'      => __( 'Price from lower', 'allmighty' ),
+    'date' => __( 'New arrivals', 'allmighty' ),
+    'price-desc' => __( 'Price from higher', 'allmighty' ),
+    'price' => __( 'Price from lower', 'allmighty' ),
 );
 ?>
 
@@ -57,9 +61,7 @@ $sort_options = array(
 <section class="breadcrumbs-section bg-white">
 	<div class="container mx-auto px-4">
 		<div class="h-16 lg:h-20 flex items-center">
-			<?php if ( function_exists( 'yoast_breadcrumb' ) ) : ?>
-				<?php yoast_breadcrumb( '<nav class="breadcrumbs text-sm text-[#626262]">', '</nav>' ); ?>
-			<?php else : ?>
+
 				<nav class="breadcrumbs text-sm text-[#626262]">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-[#3a3a3a] transition-colors">
 						<?php esc_html_e( 'Almighty Victory', 'allmighty' ); ?>
@@ -71,7 +73,7 @@ $sort_options = array(
 						<span><?php esc_html_e( 'Shop', 'allmighty' ); ?></span>
 					<?php endif; ?>
 				</nav>
-			<?php endif; ?>
+	
 		</div>
 	</div>
 </section>
@@ -132,20 +134,20 @@ $sort_options = array(
 </section>
 
 <!-- Categories Section -->
-<section class="categories-section bg-[#3a3a3a] py-8">
+<section class="categories-section text-[#3a3a3a] py-8">
 	<div class="container mx-auto px-4">
-		<h2 class="text-white text-2xl lg:text-3xl font-light text-center mb-6">
+		<h2 class=" text-2xl lg:text-3xl font-light text-center mb-6">
 			<?php esc_html_e( 'Categories', 'allmighty' ); ?>
 		</h2>
 
-		<?php if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) : ?>
+		<?php if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) : ?>
 			<div class="flex flex-wrap justify-center gap-4">
-				<?php foreach ( $product_categories as $cat ) :
+				<?php foreach ( $categories as $cat ) :
 					$cat_count = $cat->count;
 					$is_active = ( $is_category && $current_category && $current_category->term_id === $cat->term_id );
 				?>
 					<a href="<?php echo esc_url( get_term_link( $cat ) ); ?>"
-					   class="category-card flex items-center justify-between min-w-[200px] px-6 py-4 rounded-lg border-2 transition-all <?php echo $is_active ? 'bg-white text-[#3a3a3a] border-white' : 'bg-transparent text-white border-white/30 hover:border-white'; ?>">
+					   class="category-card flex items-center justify-between min-w-[200px] px-6 py-4 rounded-lg border-2 transition-all text-[#3a3a3a] <?php echo $is_active ? 'bg-white  border-white' : 'bg-transparent  border-white/30 hover:border-white'; ?>">
 						<span class="font-medium"><?php echo esc_html( $cat->name ); ?></span>
 						<span class="ml-4 w-8 h-8 flex items-center justify-center rounded-full <?php echo $is_active ? 'bg-[#3a3a3a] text-white' : 'bg-white/20 text-white'; ?> text-sm font-bold">
 							<?php echo esc_html( $cat_count ); ?>
@@ -158,7 +160,7 @@ $sort_options = array(
 </section>
 
 <!-- Toolbar Section -->
-<section class="toolbar-section bg-[#3a3a3a] pb-8">
+<section class="toolbar-section  pb-8 text-[#3a3a3a]">
 	<div class="container mx-auto px-4">
 		<div class="flex items-center justify-between">
 			<!-- Filters Button -->
@@ -173,7 +175,7 @@ $sort_options = array(
 			<!-- Sort Dropdown -->
 			<div class="relative">
 				<button id="sort-toggle"
-				        class="flex items-center gap-2 px-6 py-3 bg-transparent text-white border border-white/30 rounded-lg hover:border-white transition-colors">
+				        class="flex items-center gap-2 px-6 py-3 bg-transparent text-[#3a3a3a] border border-white/30 rounded-lg hover:border-white transition-colors">
 					<span id="sort-label"><?php echo esc_html( $sort_options[ $current_sort ] ?? $sort_options['date'] ); ?></span>
 					<svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -196,7 +198,7 @@ $sort_options = array(
 </section>
 
 <!-- Filter Modal (Mobile Fullscreen) -->
-<div id="filter-modal" class="fixed inset-0 bg-gray-50 z-50 lg:hidden overflow-y-auto">
+<div id="filter-modal" class="fixed inset-0 bg-gray-50 z-50 overflow-y-auto md:w-1/4">
 	<div class="min-h-full flex flex-col">
 		<!-- Header -->
 		<div class="flex items-center justify-between p-6 border-b border-gray-200">
@@ -212,56 +214,63 @@ $sort_options = array(
 		<form id="filter-form" class="flex-1 p-6 space-y-8">
 			<!-- Type (Categories) -->
 			<div class="filter-group">
-				<h3 class="text-lg font-semibold text-[#3a3a3a] mb-4"><?php esc_html_e( 'Type', 'allmighty' ); ?></h3>
-				<div class="space-y-3">
-					<?php foreach ( $product_categories as $cat ) : ?>
-						<label class="flex items-center gap-3 cursor-pointer">
-							<input type="checkbox"
-							       name="product_cat[]"
-							       value="<?php echo esc_attr( $cat->slug ); ?>"
-							       <?php checked( in_array( $cat->slug, (array) $current_category_filter, true ) ); ?>
-							       class="filter-checkbox w-5 h-5 rounded border-gray-300 text-[#3a3a3a] focus:ring-[#3a3a3a]">
-							<span class="text-[#3a3a3a]"><?php echo esc_html( $cat->name ); ?></span>
-						</label>
-					<?php endforeach; ?>
-				</div>
+				<h3 class="font-semibold mb-4"><?php esc_html_e( 'Categories', 'allmighty' ); ?></h3>
+				<?php foreach ( $categories as $cat ) : 
+					$product_count = $cat->count;
+					$is_active = in_array( $cat->slug, $current_categories, true );
+				?>
+					<label class="flex items-center gap-3 mb-3 cursor-pointer hover:text-[#3a3a3a] transition-colors">
+						<input
+							type="checkbox"
+							name="product_categories[]"
+							value="<?php echo esc_attr( $cat->slug ); ?>"
+							<?php checked( $is_active ); ?>
+							class="filter-checkbox w-5 h-5 rounded border-gray-300 text-[#3a3a3a] focus:ring-[#3a3a3a]"
+						>
+						<span><?php echo esc_html( $cat->name ); ?> (<?php echo $product_count; ?>)</span>
+					</label>
+				<?php endforeach; ?>
 			</div>
 
 			<!-- Size -->
 			<?php if ( ! empty( $sizes ) && ! is_wp_error( $sizes ) ) : ?>
 				<div class="filter-group">
-					<h3 class="text-lg font-semibold text-[#3a3a3a] mb-4"><?php esc_html_e( 'Size', 'allmighty' ); ?></h3>
-					<div class="space-y-3">
-						<?php foreach ( $sizes as $size ) : ?>
-							<label class="flex items-center gap-3 cursor-pointer">
-								<input type="checkbox"
-								       name="filter_size[]"
-								       value="<?php echo esc_attr( $size->slug ); ?>"
-								       <?php checked( in_array( $size->slug, $current_sizes, true ) ); ?>
-								       class="filter-checkbox w-5 h-5 rounded border-gray-300 text-[#3a3a3a] focus:ring-[#3a3a3a]">
-								<span class="text-[#3a3a3a]"><?php echo esc_html( $size->name ); ?></span>
-							</label>
-						<?php endforeach; ?>
-					</div>
+					<h3 class="font-semibold mb-4"><?php esc_html_e( 'Size', 'allmighty' ); ?></h3>
+					<?php foreach ( $sizes as $size ) : 
+						$is_active = in_array( $size->slug, $current_sizes, true );
+					?>
+						<label class="flex items-center gap-3 mb-3 cursor-pointer hover:text-[#3a3a3a] transition-colors">
+							<input 
+								type="checkbox" 
+								name="filter_size[]" 
+								value="<?php echo esc_attr( $size->slug ); ?>"
+								<?php checked( $is_active ); ?>
+								class="filter-checkbox w-5 h-5 rounded border-gray-300 text-[#3a3a3a] focus:ring-[#3a3a3a]"
+							>
+							<span><?php echo esc_html( $size->name ); ?></span>
+						</label>
+					<?php endforeach; ?>
 				</div>
 			<?php endif; ?>
 
 			<!-- Color -->
 			<?php if ( ! empty( $colors ) && ! is_wp_error( $colors ) ) : ?>
 				<div class="filter-group">
-					<h3 class="text-lg font-semibold text-[#3a3a3a] mb-4"><?php esc_html_e( 'Main color', 'allmighty' ); ?></h3>
-					<div class="space-y-3">
-						<?php foreach ( $colors as $color ) : ?>
-							<label class="flex items-center gap-3 cursor-pointer">
-								<input type="checkbox"
-								       name="filter_color[]"
-								       value="<?php echo esc_attr( $color->slug ); ?>"
-								       <?php checked( in_array( $color->slug, $current_colors, true ) ); ?>
-								       class="filter-checkbox w-5 h-5 rounded border-gray-300 text-[#3a3a3a] focus:ring-[#3a3a3a]">
-								<span class="text-[#3a3a3a]"><?php echo esc_html( $color->name ); ?></span>
-							</label>
-						<?php endforeach; ?>
-					</div>
+					<h3 class="font-semibold mb-4"><?php esc_html_e( 'Color', 'allmighty' ); ?></h3>
+					<?php foreach ( $colors as $color ) : 
+						$is_active = in_array( $color->slug, $current_colors, true );
+					?>
+						<label class="flex items-center gap-3 mb-3 cursor-pointer hover:text-[#3a3a3a] transition-colors">
+							<input 
+								type="checkbox" 
+								name="filter_color[]" 
+								value="<?php echo esc_attr( $color->slug ); ?>"
+								<?php checked( $is_active ); ?>
+								class="filter-checkbox w-5 h-5 rounded border-gray-300 text-[#3a3a3a] focus:ring-[#3a3a3a]"
+							>
+							<span><?php echo esc_html( $color->name ); ?></span>
+						</label>
+					<?php endforeach; ?>
 				</div>
 			<?php endif; ?>
 		</form>
@@ -408,55 +417,27 @@ $sort_options = array(
 
 <?php
 // SEO Text Block (ACF)
-// This can be added via ACF to the Shop page or Category pages
-$seo_title   = '';
-$seo_content = '';
+// SEO Content Section
+	if ( is_product_category() ) {
+		$current_category = get_queried_object();
+		$seo_title = get_field( 'seo_title', 'product_cat_' . $current_category->term_id );
+		$seo_content = get_field( 'seo_content', 'product_cat_' . $current_category->term_id );
+	} else {
+		$seo_title = get_field( 'seo_title', 'option' );
+		$seo_content = get_field( 'seo_content', 'option' );
+	}
 
-if ( $is_category && $current_category ) {
-	$seo_title   = get_field( 'seo_title', 'product_cat_' . $current_category->term_id );
-	$seo_content = get_field( 'seo_content', 'product_cat_' . $current_category->term_id );
-} else {
-	$seo_title   = get_field( 'seo_title', 'option' );
-	$seo_content = get_field( 'seo_content', 'option' );
-}
-
-if ( $seo_content ) :
-	$show_more_text = __( 'Show more', 'allmighty' );
-	$show_less_text = __( 'Show less', 'allmighty' );
-	$preview_lines  = 4;
-	$block_id       = 'seo-text-catalog';
-	?>
-	<section class="seo-text-block py-16 bg-white">
-		<div class="container mx-auto px-4">
-			<?php if ( $seo_title ) : ?>
-				<h2 class="text-3xl lg:text-4xl font-bold text-gray-600 mb-6">
-					<?php echo esc_html( $seo_title ); ?>
-				</h2>
-			<?php endif; ?>
-
-			<div class="seo-content-wrapper relative">
-				<div id="<?php echo esc_attr( $block_id ); ?>"
-				     class="seo-text-content overflow-hidden transition-all duration-500 ease-in-out"
-				     style="max-height: <?php echo esc_attr( $preview_lines * 1.75 ); ?>rem;"
-				     data-collapsed="true">
-					<div class="text-gray-600 text-base lg:text-lg leading-relaxed prose prose-lg max-w-none">
-						<?php echo wp_kses_post( wpautop( $seo_content ) ); ?>
-					</div>
-				</div>
-
-				<div id="<?php echo esc_attr( $block_id ); ?>-overlay"
-				     class="fade-overlay absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none transition-opacity duration-500">
-				</div>
-
-				<button id="<?php echo esc_attr( $block_id ); ?>-button"
-				        class="mt-6 bg-gray-100 text-gray-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-				        data-show-more="<?php echo esc_attr( $show_more_text ); ?>"
-				        data-show-less="<?php echo esc_attr( $show_less_text ); ?>">
-					<?php echo esc_html( $show_more_text ); ?>
-				</button>
-			</div>
-		</div>
-	</section>
+	if ( $seo_content ) :
+		// Render the existing SEO text block
+		allmighty_render_single_block( 'seo-text', array(
+			'title' => $seo_title,
+			'content' => $seo_content,
+			'preview_lines' => 4,
+			'show_more_text' => __( 'Show more', 'allmighty' ),
+			'show_less_text' => __( 'Show less', 'allmighty' ),
+		));
+	endif;
+?>
 
 	<script>
 	(function() {
@@ -483,7 +464,7 @@ if ( $seo_content ) :
 		}
 	})();
 	</script>
-<?php endif; ?>
+
 
 <?php
 // Use footer-form.php (without logo)

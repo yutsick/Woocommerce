@@ -96,3 +96,44 @@ body.filter-open {
 		@apply min-h-[250px] max-h-[400px];
 	}
 }
+
+/* WooCommerce Single Product Custom Styles */
+
+
+.woocommerce .quantity {
+	@apply inline-flex items-center border border-gray-200 rounded-lg p-1 mr-4;
+}
+
+h2 {
+	@apply text-2xl font-bold my-6 text-gray-950;
+}
+
+
+.woocommerce .quantity input.qty {
+	@apply w-12 text-center bg-transparent border-none focus:ring-0 text-[#3a3a3a] font-medium;
+}
+
+
+.woocommerce button.button.single_add_to_cart_button {
+	@apply bg-[#3a3a3a] text-white px-10 py-3.5 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-black transition-all duration-300 disabled:opacity-50;
+}
+
+
+.woocommerce table.variations select {
+	@apply w-full border border-gray-200 rounded-lg p-3 bg-white text-sm text-[#3a3a3a] focus:border-[#3a3a3a] focus:ring-1 focus:ring-[#3a3a3a] outline-none appearance-none;
+}
+
+
+.woocommerce table.variations label {
+	@apply text-sm font-bold text-[#3a3a3a] uppercase mb-2 block;
+}
+
+
+.woocommerce .reset_variations {
+	@apply text-xs text-gray-400 hover:text-red-500 ml-2 mt-2 inline-block;
+}
+
+
+.woocommerce .single_variation_wrap .woocommerce-variation-price {
+	@apply mb-4 text-xl font-bold text-[#3a3a3a];
+}

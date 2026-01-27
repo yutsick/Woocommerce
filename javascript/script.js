@@ -26,14 +26,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	if (filtersToggle && filterModal) {
 		filtersToggle.addEventListener('click', function () {
-			filterModal.classList.remove('hidden');
 			filterModal.classList.add('active');
 			document.body.classList.add('filter-open');
 		});
 
 		if (filterClose) {
 			filterClose.addEventListener('click', function () {
-				filterModal.classList.add('hidden');
 				filterModal.classList.remove('active');
 				document.body.classList.remove('filter-open');
 			});
@@ -42,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		// Close on escape key
 		document.addEventListener('keydown', function (e) {
 			if (e.key === 'Escape' && filterModal.classList.contains('active')) {
-				filterModal.classList.add('hidden');
 				filterModal.classList.remove('active');
 				document.body.classList.remove('filter-open');
 			}

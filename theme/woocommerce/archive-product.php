@@ -195,8 +195,8 @@ $sort_options = array(
 	</div>
 </section>
 
-<!-- Filter Modal (Mobile Fullscreen / Desktop Sidebar) -->
-<div id="filter-modal" class="fixed inset-0 bg-gray-50 z-50 hidden lg:hidden overflow-y-auto">
+<!-- Filter Modal (Mobile Fullscreen) -->
+<div id="filter-modal" class="fixed inset-0 bg-gray-50 z-50 lg:hidden overflow-y-auto">
 	<div class="min-h-full flex flex-col">
 		<!-- Header -->
 		<div class="flex items-center justify-between p-6 border-b border-gray-200">

@@ -63,12 +63,16 @@
 
 /* Filter Modal Animation */
 #filter-modal {
-	@apply transition-transform duration-300;
+	@apply transition-all duration-300 ease-in-out;
 	transform: translateX(-100%);
+	opacity: 0;
+	visibility: hidden;
 }
 
 #filter-modal.active {
 	transform: translateX(0);
+	opacity: 1;
+	visibility: visible;
 }
 
 /* Body scroll lock when filter is open */

@@ -277,33 +277,27 @@ $all_products_count = wp_count_posts( 'product' )->publish;
 				this.resetAllFilters();
 			});
 
-			// Sort dropdown toggle
-			this.elements.sortToggle.addEventListener('click', (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const isHidden = this.elements.sortDropdown.classList.contains('hidden');
-				if (isHidden) {
-					this.elements.sortDropdown.classList.remove('hidden');
-				} else {
-					this.elements.sortDropdown.classList.add('hidden');
-				}
-			});
+			// Sort dropdown
+			const sortToggle = this.elements.sortToggle;
+			const sortDropdown = this.elements.sortDropdown;
 
-			// Sort options click (event delegation)
-			this.elements.sortDropdown.addEventListener('click', (e) => {
+
+			// Sort options
+			sortDropdown.onclick = (e) => {
+				e.stopPropagation();
 				const btn = e.target.closest('.sort-option');
 				if (btn) {
 					this.handleSortChange(btn);
+					sortDropdown.classList.add('hidden');
 				}
-			});
+			};
 
-			// Close sort dropdown on outside click
-			document.addEventListener('click', (e) => {
-				const sortContainer = this.elements.sortToggle.parentElement;
-				if (!sortContainer.contains(e.target)) {
-					this.elements.sortDropdown.classList.add('hidden');
+			// Close on outside click
+			document.onclick = (e) => {
+				if (!sortToggle.contains(e.target) && !sortDropdown.contains(e.target)) {
+					sortDropdown.classList.add('hidden');
 				}
-			});
+			};
 
 			// Pagination (event delegation)
 			this.elements.paginationContainer.addEventListener('click', (e) => {

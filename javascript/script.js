@@ -160,4 +160,114 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 		});
 	}
+
+	// =====================
+	// Checkout Page Functionality
+	// =====================
+	const checkoutForm = document.getElementById('checkout-form');
+
+	if (checkoutForm) {
+		// Quantity Controls
+		const quantityMinusButtons = document.querySelectorAll('.quantity-minus');
+		const quantityPlusButtons = document.querySelectorAll('.quantity-plus');
+		const removeButtons = document.querySelectorAll('.remove-cart-item');
+
+		// Update cart via AJAX
+		async function updateCartItem(cartItemKey, quantity) {
+			checkoutForm.classList.add('loading');
+
+			try {
+				const response = await fetch(window.allmightyAjax?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: new URLSearchParams({
+						action: 'allmighty_update_cart_item',
+						cart_item_key: cartItemKey,
+						quantity: quantity,
+						nonce: window.allmightyAjax?.nonce || '',
+					}),
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					// Update total
+					const cartTotal = document.querySelector('.cart-total');
+					if (cartTotal && data.data.total) {
+						cartTotal.innerHTML = data.data.total;
+					}
+
+					// Remove item from DOM if quantity is 0
+					if (quantity === 0) {
+						const cartItem = document.querySelector(`[data-cart-item-key="${cartItemKey}"]`);
+						if (cartItem) {
+							cartItem.remove();
+						}
+
+						// Redirect to shop if cart is empty
+						if (data.data.cart_empty) {
+							window.location.href = data.data.shop_url || '/shop';
+						}
+					}
+				} else {
+					console.error('Error updating cart:', data.data?.message);
+				}
+			} catch (error) {
+				console.error('AJAX error:', error);
+			} finally {
+				checkoutForm.classList.remove('loading');
+			}
+		}
+
+		// Minus button click
+		quantityMinusButtons.forEach((button) => {
+			button.addEventListener('click', function () {
+				const cartItemKey = this.dataset.cartItemKey;
+				const quantityEl = this.parentElement.querySelector('.quantity-value');
+				let quantity = parseInt(quantityEl.textContent, 10);
+
+				if (quantity > 1) {
+					quantity--;
+					quantityEl.textContent = quantity;
+					updateCartItem(cartItemKey, quantity);
+				}
+			});
+		});
+
+		// Plus button click
+		quantityPlusButtons.forEach((button) => {
+			button.addEventListener('click', function () {
+				const cartItemKey = this.dataset.cartItemKey;
+				const quantityEl = this.parentElement.querySelector('.quantity-value');
+				let quantity = parseInt(quantityEl.textContent, 10);
+
+				quantity++;
+				quantityEl.textContent = quantity;
+				updateCartItem(cartItemKey, quantity);
+			});
+		});
+
+		// Remove button click
+		removeButtons.forEach((button) => {
+			button.addEventListener('click', function () {
+				const cartItemKey = this.dataset.cartItemKey;
+				updateCartItem(cartItemKey, 0);
+			});
+		});
+
+		// Payment method change - handle Monobank
+		const paymentMethodSelect = document.getElementById('payment_method');
+		if (paymentMethodSelect) {
+			paymentMethodSelect.addEventListener('change', function () {
+				const submitButtons = document.querySelectorAll('#place-order-mobile, #place-order-desktop');
+				const isOnline = this.value === 'online';
+
+				submitButtons.forEach((btn) => {
+					btn.textContent = isOnline ? 'Pay now' : 'Place order';
+				});
+			});
+		}
+	}
 });

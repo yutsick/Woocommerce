@@ -435,3 +435,142 @@ function allmighty_fix_product_cat_array( $query_vars ) {
 	return $query_vars;
 }
 add_filter( 'request', 'allmighty_fix_product_cat_array', 1 );
+
+/**
+ * Enqueue checkout scripts with AJAX data.
+ */
+function allmighty_checkout_scripts() {
+	if ( is_checkout() ) {
+		wp_localize_script( 'allmighty-script', 'allmightyAjax', array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'allmighty_checkout_nonce' ),
+		) );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'allmighty_checkout_scripts', 20 );
+
+/**
+ * AJAX: Update cart item quantity.
+ */
+function allmighty_update_cart_item() {
+	check_ajax_referer( 'allmighty_checkout_nonce', 'nonce' );
+
+	$cart_item_key = isset( $_POST['cart_item_key'] ) ? sanitize_text_field( $_POST['cart_item_key'] ) : '';
+	$quantity      = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 0;
+
+	if ( empty( $cart_item_key ) ) {
+		wp_send_json_error( array( 'message' => __( 'Invalid cart item.', 'allmighty' ) ) );
+	}
+
+	if ( $quantity === 0 ) {
+		// Remove item
+		WC()->cart->remove_cart_item( $cart_item_key );
+	} else {
+		// Update quantity
+		WC()->cart->set_quantity( $cart_item_key, $quantity );
+	}
+
+	// Recalculate totals
+	WC()->cart->calculate_totals();
+
+	wp_send_json_success( array(
+		'total'      => WC()->cart->get_total(),
+		'cart_empty' => WC()->cart->is_empty(),
+		'shop_url'   => wc_get_page_permalink( 'shop' ),
+	) );
+}
+add_action( 'wp_ajax_allmighty_update_cart_item', 'allmighty_update_cart_item' );
+add_action( 'wp_ajax_nopriv_allmighty_update_cart_item', 'allmighty_update_cart_item' );
+
+/**
+ * Custom checkout field processing.
+ */
+function allmighty_checkout_process() {
+	// Validate required fields
+	if ( empty( $_POST['billing_name'] ) ) {
+		wc_add_notice( __( 'Please enter your full name.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['billing_phone'] ) ) {
+		wc_add_notice( __( 'Please enter your phone number.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['shipping_city'] ) ) {
+		wc_add_notice( __( 'Please enter your delivery city.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['shipping_address'] ) ) {
+		wc_add_notice( __( 'Please enter your delivery address.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['privacy_agreement'] ) ) {
+		wc_add_notice( __( 'Please agree to the personal data processing.', 'allmighty' ), 'error' );
+	}
+}
+add_action( 'woocommerce_checkout_process', 'allmighty_checkout_process' );
+
+/**
+ * Save custom checkout fields to order.
+ *
+ * @param int $order_id The order ID.
+ */
+function allmighty_checkout_update_order_meta( $order_id ) {
+	$order = wc_get_order( $order_id );
+
+	if ( ! empty( $_POST['billing_name'] ) ) {
+		$order->update_meta_data( '_billing_full_name', sanitize_text_field( $_POST['billing_name'] ) );
+		// Split name for WooCommerce compatibility
+		$name_parts = explode( ' ', sanitize_text_field( $_POST['billing_name'] ), 2 );
+		$order->set_billing_first_name( $name_parts[0] );
+		$order->set_billing_last_name( isset( $name_parts[1] ) ? $name_parts[1] : '' );
+	}
+
+	if ( ! empty( $_POST['billing_phone'] ) ) {
+		$order->set_billing_phone( sanitize_text_field( $_POST['billing_phone'] ) );
+	}
+
+	if ( ! empty( $_POST['billing_email'] ) ) {
+		$order->set_billing_email( sanitize_email( $_POST['billing_email'] ) );
+	}
+
+	if ( ! empty( $_POST['shipping_city'] ) ) {
+		$order->set_shipping_city( sanitize_text_field( $_POST['shipping_city'] ) );
+		$order->set_billing_city( sanitize_text_field( $_POST['shipping_city'] ) );
+	}
+
+	if ( ! empty( $_POST['shipping_method'] ) ) {
+		$order->update_meta_data( '_shipping_method_custom', sanitize_text_field( $_POST['shipping_method'] ) );
+	}
+
+	if ( ! empty( $_POST['shipping_address'] ) ) {
+		$order->set_shipping_address_1( sanitize_text_field( $_POST['shipping_address'] ) );
+		$order->set_billing_address_1( sanitize_text_field( $_POST['shipping_address'] ) );
+	}
+
+	if ( ! empty( $_POST['no_callback'] ) ) {
+		$order->update_meta_data( '_no_callback', 'yes' );
+	}
+
+	$order->save();
+}
+add_action( 'woocommerce_checkout_update_order_meta', 'allmighty_checkout_update_order_meta' );
+
+/**
+ * Redirect to Monobank payment if online payment selected.
+ *
+ * @param int    $order_id The order ID.
+ * @param array  $posted_data Posted data.
+ * @param object $order The order object.
+ */
+function allmighty_process_monobank_payment( $order_id, $posted_data, $order ) {
+	$payment_method = isset( $_POST['payment_method'] ) ? sanitize_text_field( $_POST['payment_method'] ) : '';
+
+	if ( $payment_method === 'online' ) {
+		// Set payment method to Monobank if available
+		if ( class_exists( 'WC_Gateway_Monobank' ) || in_array( 'monobank', array_keys( WC()->payment_gateways()->get_available_payment_gateways() ) ) ) {
+			$order->set_payment_method( 'monobank' );
+			$order->save();
+		}
+	}
+}
+add_action( 'woocommerce_checkout_order_processed', 'allmighty_process_monobank_payment', 10, 3 );

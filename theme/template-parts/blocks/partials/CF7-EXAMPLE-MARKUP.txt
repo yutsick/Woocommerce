@@ -1,0 +1,78 @@
+========================================
+CONTACT FORM 7 - EXAMPLE FORM MARKUP
+========================================
+
+Copy and paste this into Contact Form 7 admin panel when creating the form.
+
+IMPORTANT: Replace "REPLACE_WITH_REAL_ID" in contact_form.php with the actual CF7 form ID.
+
+----------------------------------------
+FORM MARKUP (Form tab in CF7):
+----------------------------------------
+
+<div class="form-field">
+	<label>
+		[text* your-name placeholder "Name"]
+	</label>
+</div>
+
+<div class="form-field">
+	<label>
+		[tel your-phone placeholder "Phone"]
+	</label>
+</div>
+
+<div class="form-field">
+	<label>
+		[textarea* your-message placeholder "Please type your message here..."]
+	</label>
+</div>
+
+<div class="form-checkbox">
+	<label>
+		[acceptance acceptance-terms]
+		<span>I agree to the personal data processing</span>
+	</label>
+</div>
+
+<div class="form-submit">
+	[submit "Send"]
+</div>
+
+----------------------------------------
+MAIL TEMPLATE (Mail tab in CF7):
+----------------------------------------
+
+To: your-email@example.com
+From: [your-name] <[your-email]>
+Subject: New Contact Form Submission
+
+Name: [your-name]
+Phone: [your-phone]
+Message: [your-message]
+
+--
+This e-mail was sent from a contact form on [_site_title] ([_site_url])
+
+----------------------------------------
+FIELD EXPLANATIONS:
+----------------------------------------
+
+[text* your-name] - Required text field for name
+[tel your-phone] - Phone number field (optional, change to tel* for required)
+[textarea* your-message] - Required textarea for message
+[acceptance acceptance-terms] - GDPR checkbox (must be checked to submit)
+[submit "Send"] - Submit button with text "Send"
+
+----------------------------------------
+MULTILINGUAL SUPPORT:
+----------------------------------------
+
+For Ukrainian language, replace placeholders:
+- "Name" → "Ім'я"
+- "Phone" → "Телефон"
+- "Please type your message here..." → "Введіть ваше повідомлення тут..."
+- "I agree to the personal data processing" → "Я погоджуюся з обробкою персональних даних"
+- "Send" → "Надіслати"
+
+----------------------------------------

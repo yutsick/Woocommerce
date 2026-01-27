@@ -1,0 +1,595 @@
+{
+  "key": "group_page_content_blocks",
+  "title": "Page Content Blocks",
+  "fields": [
+    {
+      "key": "field_content_blocks",
+      "label": "Content Blocks",
+      "name": "content_blocks",
+      "aria-label": "",
+      "type": "flexible_content",
+      "instructions": "Add and arrange content blocks for this page",
+      "required": 0,
+      "conditional_logic": 0,
+      "wrapper": {
+        "width": "",
+        "class": "",
+        "id": ""
+      },
+      "layouts": {
+        "layout_hero_section": {
+          "key": "layout_hero_section",
+          "name": "hero_section",
+          "label": "Hero Section",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_hero_background_image",
+              "label": "Background Image",
+              "name": "background_image",
+              "aria-label": "",
+              "type": "image",
+              "instructions": "Main hero background image (recommended: 1920x800px)",
+              "required": 1,
+              "return_format": "array",
+              "library": "all",
+              "min_width": "",
+              "min_height": "",
+              "min_size": "",
+              "max_width": "",
+              "max_height": "",
+              "max_size": "",
+              "mime_types": "",
+              "preview_size": "medium"
+            },
+            {
+              "key": "field_hero_secondary_image",
+              "label": "Secondary Image",
+              "name": "secondary_image",
+              "aria-label": "",
+              "type": "image",
+              "instructions": "Additional image for mobile version (optional)",
+              "required": 0,
+              "return_format": "array",
+              "library": "all",
+              "preview_size": "medium"
+            },
+            {
+              "key": "field_hero_title",
+              "label": "Title",
+              "name": "title",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Main heading (e.g., \"GLORIFY GOD\")",
+              "required": 1,
+              "default_value": "GLORIFY GOD",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_hero_subtitle",
+              "label": "Subtitle",
+              "name": "subtitle",
+              "aria-label": "",
+              "type": "textarea",
+              "instructions": "Hero subtitle/description",
+              "required": 0,
+              "default_value": "Honor Body Temple with our clothing",
+              "maxlength": "",
+              "rows": 3,
+              "placeholder": ""
+            },
+            {
+              "key": "field_hero_button_text",
+              "label": "Button Text",
+              "name": "button_text",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "CTA button text (optional)",
+              "required": 0,
+              "default_value": "See all products",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_hero_button_link",
+              "label": "Button Link",
+              "name": "button_link",
+              "aria-label": "",
+              "type": "url",
+              "instructions": "CTA button URL (optional)",
+              "required": 0,
+              "default_value": "",
+              "placeholder": "https://"
+            }
+          ],
+          "min": "",
+          "max": ""
+        },
+        "layout_best_offers": {
+          "key": "layout_best_offers",
+          "name": "best_offers",
+          "label": "Best Offers",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_offers_section_title",
+              "label": "Section Title",
+              "name": "section_title",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Section heading",
+              "required": 0,
+              "default_value": "Best offers",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_offers_products_source",
+              "label": "Products Source",
+              "name": "products_source",
+              "aria-label": "",
+              "type": "select",
+              "instructions": "How to select products to display",
+              "required": 0,
+              "choices": {
+                "popular": "Popular Products (by sales)",
+                "featured": "Featured Products",
+                "manual": "Manual Selection"
+              },
+              "default_value": "popular",
+              "return_format": "value",
+              "multiple": 0,
+              "allow_null": 0,
+              "ui": 0,
+              "ajax": 0,
+              "placeholder": ""
+            },
+            {
+              "key": "field_offers_products_count",
+              "label": "Products Count",
+              "name": "products_count",
+              "aria-label": "",
+              "type": "number",
+              "instructions": "How many products to display",
+              "required": 0,
+              "default_value": 6,
+              "min": 1,
+              "max": 12,
+              "step": 1,
+              "placeholder": ""
+            },
+            {
+              "key": "field_offers_products",
+              "label": "Products",
+              "name": "products",
+              "aria-label": "",
+              "type": "relationship",
+              "instructions": "Select products manually (only if source is \"Manual Selection\")",
+              "required": 0,
+              "conditional_logic": [
+                [
+                  {
+                    "field": "field_offers_products_source",
+                    "operator": "==",
+                    "value": "manual"
+                  }
+                ]
+              ],
+              "post_type": [
+                "product"
+              ],
+              "post_status": "",
+              "taxonomy": "",
+              "filters": [
+                "search"
+              ],
+              "return_format": "object",
+              "min": "",
+              "max": "",
+              "elements": ""
+            }
+          ],
+          "min": "",
+          "max": ""
+        },
+        "layout_categories": {
+          "key": "layout_categories",
+          "name": "categories",
+          "label": "Categories",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_categories_section_title",
+              "label": "Section Title",
+              "name": "section_title",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Section heading",
+              "required": 0,
+              "default_value": "Categories",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_categories_order",
+              "label": "Categories Order",
+              "name": "categories_order",
+              "aria-label": "",
+              "type": "select",
+              "instructions": "How to sort categories",
+              "required": 0,
+              "choices": {
+                "name": "By Name (A-Z)",
+                "count": "By Product Count (Most Popular)",
+                "menu_order": "By Menu Order"
+              },
+              "default_value": "name",
+              "return_format": "value",
+              "multiple": 0,
+              "allow_null": 0,
+              "ui": 0,
+              "ajax": 0,
+              "placeholder": ""
+            },
+            {
+              "key": "field_categories_exclude",
+              "label": "Exclude Categories",
+              "name": "exclude_categories",
+              "aria-label": "",
+              "type": "taxonomy",
+              "instructions": "Select categories to exclude (optional)",
+              "required": 0,
+              "taxonomy": "product_cat",
+              "add_term": 0,
+              "save_terms": 0,
+              "load_terms": 0,
+              "return_format": "object",
+              "field_type": "multi_select",
+              "multiple": 0,
+              "allow_null": 0
+            }
+          ],
+          "min": "",
+          "max": ""
+        },
+        "layout_accent_block": {
+          "key": "layout_accent_block",
+          "name": "accent_block",
+          "label": "Accent Block",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_accent_background_color",
+              "label": "Background Color",
+              "name": "background_color",
+              "aria-label": "",
+              "type": "color_picker",
+              "instructions": "Block background color",
+              "required": 0,
+              "default_value": "#3a3a3a",
+              "enable_opacity": 0,
+              "return_format": "string"
+            },
+            {
+              "key": "field_accent_title",
+              "label": "Title",
+              "name": "title",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Block heading",
+              "required": 1,
+              "default_value": "Our mission",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_accent_content",
+              "label": "Content",
+              "name": "content",
+              "aria-label": "",
+              "type": "wysiwyg",
+              "instructions": "Main text content",
+              "required": 1,
+              "default_value": "",
+              "tabs": "all",
+              "toolbar": "full",
+              "media_upload": 0,
+              "delay": 0
+            },
+            {
+              "key": "field_accent_button_text",
+              "label": "Button Text",
+              "name": "button_text",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "CTA button text (optional - button shows only if both text and link are filled)",
+              "required": 0,
+              "default_value": "Learn more",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_accent_button_link",
+              "label": "Button Link",
+              "name": "button_link",
+              "aria-label": "",
+              "type": "url",
+              "instructions": "CTA button URL (optional)",
+              "required": 0,
+              "default_value": "",
+              "placeholder": "https://"
+            },
+            {
+              "key": "field_accent_image",
+              "label": "Image",
+              "name": "image",
+              "aria-label": "",
+              "type": "image",
+              "instructions": "Side/background image (optional)",
+              "required": 0,
+              "return_format": "array",
+              "library": "all",
+              "preview_size": "medium"
+            },
+            {
+              "key": "field_accent_image_position",
+              "label": "Image Position",
+              "name": "image_position",
+              "aria-label": "",
+              "type": "select",
+              "instructions": "Where to display the image",
+              "required": 0,
+              "choices": {
+                "right": "Right Side",
+                "left": "Left Side",
+                "background": "Background"
+              },
+              "default_value": "right",
+              "return_format": "value",
+              "multiple": 0,
+              "allow_null": 0,
+              "ui": 0,
+              "ajax": 0,
+              "placeholder": ""
+            }
+          ],
+          "min": "",
+          "max": ""
+        },
+        "layout_testimonials": {
+          "key": "layout_testimonials",
+          "name": "testimonials",
+          "label": "Testimonials",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_testimonials_section_title",
+              "label": "Section Title",
+              "name": "section_title",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Section heading",
+              "required": 0,
+              "default_value": "What our clients say:",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_testimonials_items",
+              "label": "Testimonials",
+              "name": "testimonials",
+              "aria-label": "",
+              "type": "repeater",
+              "instructions": "Add customer testimonials",
+              "required": 1,
+              "layout": "block",
+              "pagination": 0,
+              "min": 1,
+              "max": 0,
+              "collapsed": "",
+              "button_label": "Add Testimonial",
+              "rows_per_page": 20,
+              "sub_fields": [
+                {
+                  "key": "field_testimonial_rating",
+                  "label": "Rating",
+                  "name": "rating",
+                  "aria-label": "",
+                  "type": "number",
+                  "instructions": "Star rating (1-5)",
+                  "required": 0,
+                  "default_value": 5,
+                  "min": 1,
+                  "max": 5,
+                  "step": 1,
+                  "placeholder": ""
+                },
+                {
+                  "key": "field_testimonial_quote",
+                  "label": "Quote",
+                  "name": "quote",
+                  "aria-label": "",
+                  "type": "textarea",
+                  "instructions": "Testimonial text",
+                  "required": 1,
+                  "default_value": "",
+                  "maxlength": "",
+                  "rows": 4,
+                  "placeholder": ""
+                },
+                {
+                  "key": "field_testimonial_author_name",
+                  "label": "Author Name",
+                  "name": "author_name",
+                  "aria-label": "",
+                  "type": "text",
+                  "instructions": "Customer name",
+                  "required": 1,
+                  "default_value": "",
+                  "maxlength": "",
+                  "placeholder": ""
+                }
+              ]
+            }
+          ],
+          "min": "",
+          "max": ""
+        },
+        "layout_seo_text": {
+          "key": "layout_seo_text",
+          "name": "seo_text",
+          "label": "SEO Text",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_seo_title",
+              "label": "Title",
+              "name": "title",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Block heading",
+              "required": 1,
+              "default_value": "Christian clothes in Ukraine (SEO)",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_seo_content",
+              "label": "Content",
+              "name": "content",
+              "aria-label": "",
+              "type": "wysiwyg",
+              "instructions": "SEO text content",
+              "required": 1,
+              "default_value": "",
+              "tabs": "all",
+              "toolbar": "full",
+              "media_upload": 0,
+              "delay": 0
+            },
+            {
+              "key": "field_seo_show_more_text",
+              "label": "Show More Text",
+              "name": "show_more_text",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Button text for expanding content",
+              "required": 0,
+              "default_value": "Show more",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_seo_show_less_text",
+              "label": "Show Less Text",
+              "name": "show_less_text",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Button text for collapsing content",
+              "required": 0,
+              "default_value": "Show less",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_seo_preview_lines",
+              "label": "Preview Lines",
+              "name": "preview_lines",
+              "aria-label": "",
+              "type": "number",
+              "instructions": "Number of lines to show initially",
+              "required": 0,
+              "default_value": 4,
+              "min": 2,
+              "max": 10,
+              "step": 1,
+              "placeholder": ""
+            }
+          ],
+          "min": "",
+          "max": ""
+        },
+        "layout_contact_form": {
+          "key": "layout_contact_form",
+          "name": "contact_form",
+          "label": "Contact Form",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_contact_image",
+              "label": "Image",
+              "name": "image",
+              "aria-label": "",
+              "type": "image",
+              "instructions": "Background/side image (optional)",
+              "required": 0,
+              "return_format": "array",
+              "library": "all",
+              "preview_size": "medium"
+            },
+            {
+              "key": "field_contact_form_shortcode",
+              "label": "Form Shortcode",
+              "name": "form_shortcode",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Contact Form 7 shortcode (e.g., [contact-form-7 id=\"123\"])",
+              "required": 1,
+              "default_value": "[contact-form-7 id=\"REPLACE_WITH_REAL_ID\"]",
+              "maxlength": "",
+              "placeholder": "[contact-form-7 id=\"123\"]"
+            },
+            {
+              "key": "field_contact_title",
+              "label": "Title",
+              "name": "title",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Form heading",
+              "required": 0,
+              "default_value": "Contact form",
+              "maxlength": "",
+              "placeholder": ""
+            },
+            {
+              "key": "field_contact_subtitle",
+              "label": "Subtitle",
+              "name": "subtitle",
+              "aria-label": "",
+              "type": "text",
+              "instructions": "Form subtitle",
+              "required": 0,
+              "default_value": "We want to hear from you",
+              "maxlength": "",
+              "placeholder": ""
+            }
+          ],
+          "min": "",
+          "max": ""
+        }
+      },
+      "min": "",
+      "max": "",
+      "button_label": "Add Block"
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "post_type",
+        "operator": "==",
+        "value": "page"
+      }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "hide_on_screen": "",
+  "active": true,
+  "description": "Flexible content blocks for building custom pages",
+  "show_in_rest": 0
+}

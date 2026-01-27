@@ -1,0 +1,84 @@
+/**
+ * Navigation Menu Styles
+ */
+
+/* Desktop Menu */
+#primary-menu {
+	@apply flex items-center space-x-8;
+}
+
+#primary-menu li {
+	@apply list-none;
+}
+
+#primary-menu a {
+	@apply text-white font-medium text-base hover:text-gray-300 transition-colors no-underline;
+}
+
+#primary-menu .current-menu-item a,
+#primary-menu .current_page_item a {
+	@apply text-gray-300;
+}
+
+/* Mobile Menu */
+#mobile-menu nav ul {
+	@apply flex flex-col items-center space-y-8 text-center;
+}
+
+#mobile-menu nav li {
+	@apply list-none;
+}
+
+#mobile-menu nav a {
+	@apply text-white font-medium text-2xl hover:text-gray-300 transition-colors no-underline;
+}
+
+#mobile-menu .current-menu-item a,
+#mobile-menu .current_page_item a {
+	@apply text-gray-300;
+}
+
+/* Submenu styles (if needed) */
+#primary-menu .sub-menu {
+	@apply absolute top-full left-0 bg-[#4a4a4a] rounded-lg shadow-lg py-2 mt-2 min-w-[200px] hidden;
+}
+
+#primary-menu li:hover > .sub-menu {
+	@apply block;
+}
+
+#primary-menu .sub-menu li {
+	@apply block;
+}
+
+#primary-menu .sub-menu a {
+	@apply block px-4 py-2 hover:bg-[#5a5a5a];
+}
+
+/* Footer Menu */
+#footer-menu,
+#footer-menu-mobile {
+	@apply flex items-center gap-8;
+}
+
+#footer-menu li,
+#footer-menu-mobile li {
+	@apply list-none;
+}
+
+#footer-menu a,
+#footer-menu-mobile a {
+	@apply text-white font-medium text-base hover:text-gray-300 transition-colors no-underline;
+}
+
+#footer-menu .current-menu-item a,
+#footer-menu .current_page_item a,
+#footer-menu-mobile .current-menu-item a,
+#footer-menu-mobile .current_page_item a {
+	@apply text-gray-300;
+}
+
+/* Mobile footer menu specific styles */
+#footer-menu-mobile {
+	@apply flex-col text-lg;
+}

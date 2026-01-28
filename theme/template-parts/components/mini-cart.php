@@ -13,7 +13,7 @@ $cart_count = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 ?>
 
 <!-- Mini Cart Overlay -->
-<div id="mini-cart-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden"></div>
+<div id="mini-cart-overlay" class="fixed inset-0 bg-black/50 z-[60]"></div>
 
 <!-- Mini Cart Drawer -->
 <div id="mini-cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] shadow-2xl">

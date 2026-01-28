@@ -251,6 +251,16 @@ function allmighty_add_woocommerce_support() {
 add_action( 'after_setup_theme', 'allmighty_add_woocommerce_support' );
 
 /**
+ * Enqueue WooCommerce variation scripts on single product page.
+ */
+function allmighty_enqueue_variation_scripts() {
+	if ( is_product() ) {
+		wp_enqueue_script( 'wc-add-to-cart-variation' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'allmighty_enqueue_variation_scripts' );
+
+/**
  * Use custom template for WooCommerce shop page.
  *
  * @param string $template The template path.
@@ -480,6 +490,104 @@ function allmighty_update_cart_item() {
 }
 add_action( 'wp_ajax_allmighty_update_cart_item', 'allmighty_update_cart_item' );
 add_action( 'wp_ajax_nopriv_allmighty_update_cart_item', 'allmighty_update_cart_item' );
+
+/**
+ * AJAX add to cart handler.
+ */
+function allmighty_add_to_cart() {
+	check_ajax_referer( 'allmighty_checkout_nonce', 'nonce' );
+
+	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+	$quantity   = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
+
+	if ( ! $product_id ) {
+		wp_send_json_error( array( 'message' => __( 'Invalid product.', 'allmighty' ) ) );
+	}
+
+	$product = wc_get_product( $product_id );
+
+	if ( ! $product ) {
+		wp_send_json_error( array( 'message' => __( 'Product not found.', 'allmighty' ) ) );
+	}
+
+	// Add to cart
+	$cart_item_key = WC()->cart->add_to_cart( $product_id, $quantity );
+
+	if ( $cart_item_key ) {
+		// Get updated mini cart HTML
+		ob_start();
+		$cart_items = WC()->cart->get_cart();
+		if ( ! empty( $cart_items ) ) :
+			echo '<div class="space-y-6">';
+			foreach ( $cart_items as $item_key => $cart_item ) :
+				$item_product = $cart_item['data'];
+				$item_qty     = $cart_item['quantity'];
+				$price        = WC()->cart->get_product_price( $item_product );
+				$thumbnail    = get_the_post_thumbnail_url( $cart_item['product_id'], 'thumbnail' );
+				$variation_data = array();
+				if ( ! empty( $cart_item['variation'] ) ) {
+					foreach ( $cart_item['variation'] as $attr => $value ) {
+						$attr_name = str_replace( 'attribute_pa_', '', $attr );
+						$attr_name = str_replace( 'attribute_', '', $attr_name );
+						$variation_data[ ucfirst( $attr_name ) ] = ucfirst( $value );
+					}
+				}
+				?>
+				<div class="mini-cart-item flex gap-4" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+					<div class="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+						<?php if ( $thumbnail ) : ?>
+							<img src="<?php echo esc_url( $thumbnail ); ?>" alt="<?php echo esc_attr( $item_product->get_name() ); ?>" class="w-full h-full object-cover">
+						<?php else : ?>
+							<div class="w-full h-full bg-gray-200 flex items-center justify-center">
+								<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+								</svg>
+							</div>
+						<?php endif; ?>
+					</div>
+					<div class="flex-1">
+						<div class="flex justify-between items-start">
+							<h3 class="font-bold text-[#3a3a3a] leading-tight">"<?php echo esc_html( $item_product->get_name() ); ?>"</h3>
+							<button type="button" class="mini-cart-remove text-red-400 hover:text-red-600 transition-colors p-1" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+								</svg>
+							</button>
+						</div>
+						<div class="text-[#3a3a3a] font-medium mt-1"><?php echo wp_kses_post( $price ); ?></div>
+						<?php if ( ! empty( $variation_data ) ) : ?>
+							<div class="text-sm text-gray-500 mt-1">
+								<?php echo esc_html( implode( '   ', array_map( fn( $k, $v ) => "$k: $v", array_keys( $variation_data ), $variation_data ) ) ); ?>
+							</div>
+						<?php endif; ?>
+						<div class="mini-cart-quantity flex items-center gap-1 mt-3">
+							<button type="button" class="mini-cart-minus w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+							</button>
+							<span class="mini-cart-qty-value w-10 h-10 flex items-center justify-center bg-gray-100 text-[#3a3a3a] font-medium"><?php echo esc_html( $item_qty ); ?></span>
+							<button type="button" class="mini-cart-plus w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+							</button>
+						</div>
+					</div>
+				</div>
+				<?php
+			endforeach;
+			echo '</div>';
+		endif;
+		$mini_cart_html = ob_get_clean();
+
+		wp_send_json_success( array(
+			'cart_count'     => WC()->cart->get_cart_contents_count(),
+			'cart_total'     => WC()->cart->get_total(),
+			'mini_cart_html' => $mini_cart_html,
+		) );
+	} else {
+		wp_send_json_error( array( 'message' => __( 'Could not add to cart.', 'allmighty' ) ) );
+	}
+}
+add_action( 'wp_ajax_allmighty_add_to_cart', 'allmighty_add_to_cart' );
+add_action( 'wp_ajax_nopriv_allmighty_add_to_cart', 'allmighty_add_to_cart' );
 
 /**
  * Custom checkout field processing.

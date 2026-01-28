@@ -283,7 +283,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		// Open mini cart
 		function openMiniCart() {
 			miniCartDrawer.classList.add('active');
-			miniCartOverlay.classList.remove('hidden');
 			miniCartOverlay.classList.add('active');
 			document.body.classList.add('mini-cart-open');
 		}
@@ -292,9 +291,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		function closeMiniCart() {
 			miniCartDrawer.classList.remove('active');
 			miniCartOverlay.classList.remove('active');
-			setTimeout(() => {
-				miniCartOverlay.classList.add('hidden');
-			}, 300);
 			document.body.classList.remove('mini-cart-open');
 		}
 
@@ -415,5 +411,84 @@ document.addEventListener('DOMContentLoaded', function () {
 				updateMiniCartItem(cartItemKey, 0);
 			});
 		});
+
+		// Make openMiniCart available globally for add-to-cart events
+		window.openMiniCart = openMiniCart;
 	}
+
+	// =====================
+	// AJAX Add to Cart Handler
+	// =====================
+	// Handle AJAX add-to-cart for simple products
+	const addToCartButtons = document.querySelectorAll('.ajax_add_to_cart');
+	addToCartButtons.forEach((button) => {
+		button.addEventListener('click', async function (e) {
+			e.preventDefault();
+
+			if (this.classList.contains('loading')) return;
+
+			const productId = this.dataset.productId;
+			const quantity = this.dataset.quantity || 1;
+
+			// Add loading state
+			this.classList.add('loading');
+			const originalText = this.textContent;
+			this.textContent = '...';
+
+			try {
+				const response = await fetch(window.allmightyAjax?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: new URLSearchParams({
+						action: 'allmighty_add_to_cart',
+						product_id: productId,
+						quantity: quantity,
+						nonce: window.allmightyAjax?.nonce || '',
+					}),
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					// Update cart count badges
+					const cartCounts = document.querySelectorAll('.cart-count');
+					cartCounts.forEach((badge) => {
+						if (data.data.cart_count > 0) {
+							badge.textContent = data.data.cart_count;
+							badge.classList.remove('hidden');
+							badge.classList.add('pulse');
+							setTimeout(() => badge.classList.remove('pulse'), 300);
+						}
+					});
+
+					// Update mini cart HTML
+					const miniCartItems = document.getElementById('mini-cart-items');
+					if (miniCartItems && data.data.mini_cart_html) {
+						miniCartItems.innerHTML = data.data.mini_cart_html;
+					}
+
+					// Open mini cart
+					if (typeof window.openMiniCart === 'function') {
+						window.openMiniCart();
+					}
+
+					// Show added feedback
+					this.textContent = 'Added!';
+					setTimeout(() => {
+						this.textContent = originalText;
+					}, 1500);
+				} else {
+					this.textContent = originalText;
+					console.error('Add to cart failed:', data.data?.message);
+				}
+			} catch (error) {
+				this.textContent = originalText;
+				console.error('Add to cart error:', error);
+			} finally {
+				this.classList.remove('loading');
+			}
+		});
+	});
 });

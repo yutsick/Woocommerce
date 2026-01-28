@@ -4,21 +4,28 @@
 
 /* Mini Cart Drawer - Hidden by default */
 #mini-cart-drawer {
-	@apply transition-transform duration-300 ease-in-out;
+	@apply transition-all duration-300 ease-in-out;
 	transform: translateX(100%);
+	visibility: hidden;
 }
 
 #mini-cart-drawer.active {
 	transform: translateX(0);
+	visibility: visible;
 }
 
 /* Mini Cart Overlay */
 #mini-cart-overlay {
-	@apply transition-opacity duration-300 ease-in-out opacity-0;
+	@apply transition-all duration-300 ease-in-out;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
 }
 
 #mini-cart-overlay.active {
-	@apply opacity-100;
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
 }
 
 /* Body scroll lock when mini cart is open */

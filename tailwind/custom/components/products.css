@@ -1,0 +1,30 @@
+/**
+ * Product Card Styles
+ */
+
+/* Product Hover Overlay */
+.product-hover-overlay {
+	@apply pointer-events-none;
+}
+
+.product-card:hover .product-hover-overlay {
+	@apply pointer-events-auto;
+}
+
+/* Product Price HTML styling in overlays */
+.product-hover-overlay .woocommerce-Price-amount {
+	@apply text-white;
+}
+
+.product-hover-overlay del .woocommerce-Price-amount {
+	@apply text-white/60;
+}
+
+.product-hover-overlay ins .woocommerce-Price-amount {
+	@apply text-white;
+}
+
+/* Add to cart button loading state */
+.ajax_add_to_cart.loading {
+	@apply opacity-70 pointer-events-none;
+}

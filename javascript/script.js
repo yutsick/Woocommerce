@@ -270,4 +270,150 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		}
 	}
+
+	// =====================
+	// Mini Cart Functionality
+	// =====================
+	const miniCartDrawer = document.getElementById('mini-cart-drawer');
+	const miniCartOverlay = document.getElementById('mini-cart-overlay');
+	const miniCartClose = document.getElementById('mini-cart-close');
+	const miniCartToggles = document.querySelectorAll('.mini-cart-toggle');
+
+	if (miniCartDrawer && miniCartOverlay) {
+		// Open mini cart
+		function openMiniCart() {
+			miniCartDrawer.classList.add('active');
+			miniCartOverlay.classList.remove('hidden');
+			miniCartOverlay.classList.add('active');
+			document.body.classList.add('mini-cart-open');
+		}
+
+		// Close mini cart
+		function closeMiniCart() {
+			miniCartDrawer.classList.remove('active');
+			miniCartOverlay.classList.remove('active');
+			setTimeout(() => {
+				miniCartOverlay.classList.add('hidden');
+			}, 300);
+			document.body.classList.remove('mini-cart-open');
+		}
+
+		// Toggle buttons
+		miniCartToggles.forEach((toggle) => {
+			toggle.addEventListener('click', openMiniCart);
+		});
+
+		// Close button
+		if (miniCartClose) {
+			miniCartClose.addEventListener('click', closeMiniCart);
+		}
+
+		// Overlay click
+		miniCartOverlay.addEventListener('click', closeMiniCart);
+
+		// Escape key
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && miniCartDrawer.classList.contains('active')) {
+				closeMiniCart();
+			}
+		});
+
+		// Mini Cart AJAX Update
+		async function updateMiniCartItem(cartItemKey, quantity) {
+			miniCartDrawer.classList.add('loading');
+
+			try {
+				const response = await fetch(window.allmightyAjax?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: new URLSearchParams({
+						action: 'allmighty_update_cart_item',
+						cart_item_key: cartItemKey,
+						quantity: quantity,
+						nonce: window.allmightyAjax?.nonce || '',
+					}),
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					// Update cart count badges
+					const cartCounts = document.querySelectorAll('.cart-count');
+					cartCounts.forEach((badge) => {
+						if (data.data.cart_count > 0) {
+							badge.textContent = data.data.cart_count;
+							badge.classList.remove('hidden');
+							badge.classList.add('pulse');
+							setTimeout(() => badge.classList.remove('pulse'), 300);
+						} else {
+							badge.classList.add('hidden');
+						}
+					});
+
+					// Remove item from DOM if quantity is 0
+					if (quantity === 0) {
+						const cartItem = miniCartDrawer.querySelector(`[data-cart-item-key="${cartItemKey}"]`);
+						if (cartItem) {
+							cartItem.style.opacity = '0';
+							cartItem.style.transform = 'translateX(100%)';
+							setTimeout(() => cartItem.remove(), 300);
+						}
+
+						// Show empty cart message if cart is empty
+						if (data.data.cart_empty) {
+							setTimeout(() => {
+								location.reload();
+							}, 300);
+						}
+					}
+				} else {
+					console.error('Error updating cart:', data.data?.message);
+				}
+			} catch (error) {
+				console.error('AJAX error:', error);
+			} finally {
+				miniCartDrawer.classList.remove('loading');
+			}
+		}
+
+		// Mini Cart Quantity Controls
+		const miniCartMinusButtons = miniCartDrawer.querySelectorAll('.mini-cart-minus');
+		const miniCartPlusButtons = miniCartDrawer.querySelectorAll('.mini-cart-plus');
+		const miniCartRemoveButtons = miniCartDrawer.querySelectorAll('.mini-cart-remove');
+
+		miniCartMinusButtons.forEach((button) => {
+			button.addEventListener('click', function () {
+				const cartItemKey = this.dataset.cartItemKey;
+				const quantityEl = this.parentElement.querySelector('.mini-cart-qty-value');
+				let quantity = parseInt(quantityEl.textContent, 10);
+
+				if (quantity > 1) {
+					quantity--;
+					quantityEl.textContent = quantity;
+					updateMiniCartItem(cartItemKey, quantity);
+				}
+			});
+		});
+
+		miniCartPlusButtons.forEach((button) => {
+			button.addEventListener('click', function () {
+				const cartItemKey = this.dataset.cartItemKey;
+				const quantityEl = this.parentElement.querySelector('.mini-cart-qty-value');
+				let quantity = parseInt(quantityEl.textContent, 10);
+
+				quantity++;
+				quantityEl.textContent = quantity;
+				updateMiniCartItem(cartItemKey, quantity);
+			});
+		});
+
+		miniCartRemoveButtons.forEach((button) => {
+			button.addEventListener('click', function () {
+				const cartItemKey = this.dataset.cartItemKey;
+				updateMiniCartItem(cartItemKey, 0);
+			});
+		});
+	}
 });

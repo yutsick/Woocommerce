@@ -437,17 +437,15 @@ function allmighty_fix_product_cat_array( $query_vars ) {
 add_filter( 'request', 'allmighty_fix_product_cat_array', 1 );
 
 /**
- * Enqueue checkout scripts with AJAX data.
+ * Enqueue cart/checkout scripts with AJAX data.
  */
-function allmighty_checkout_scripts() {
-	if ( is_checkout() ) {
-		wp_localize_script( 'allmighty-script', 'allmightyAjax', array(
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce'   => wp_create_nonce( 'allmighty_checkout_nonce' ),
-		) );
-	}
+function allmighty_cart_scripts() {
+	wp_localize_script( 'allmighty-script', 'allmightyAjax', array(
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'allmighty_checkout_nonce' ),
+	) );
 }
-add_action( 'wp_enqueue_scripts', 'allmighty_checkout_scripts', 20 );
+add_action( 'wp_enqueue_scripts', 'allmighty_cart_scripts', 20 );
 
 /**
  * AJAX: Update cart item quantity.
@@ -475,6 +473,7 @@ function allmighty_update_cart_item() {
 
 	wp_send_json_success( array(
 		'total'      => WC()->cart->get_total(),
+		'cart_count' => WC()->cart->get_cart_contents_count(),
 		'cart_empty' => WC()->cart->is_empty(),
 		'shop_url'   => wc_get_page_permalink( 'shop' ),
 	) );

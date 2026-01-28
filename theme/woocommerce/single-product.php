@@ -129,6 +129,9 @@ $product_id = $product->get_id();
                         <div class="single_variation_wrap mb-6">
                             <div class="woocommerce-variation single_variation"></div>
                             <div class="woocommerce-variation-add-to-cart variations_button">
+                                <input type="hidden" name="add-to-cart" value="<?php echo absint( $product->get_id() ); ?>">
+                                <input type="hidden" name="product_id" value="<?php echo absint( $product->get_id() ); ?>">
+                                <input type="hidden" name="variation_id" class="variation_id" value="0">
                                 <div class="flex items-center gap-4">
                                     <?php
                                     woocommerce_quantity_input(

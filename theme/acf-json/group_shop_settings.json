@@ -1,0 +1,127 @@
+{
+    "key": "group_shop_settings",
+    "title": "Shop Settings",
+    "fields": [
+        {
+            "key": "field_shop_hero_tab",
+            "label": "Shop Page Hero",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "placement": "top",
+            "endpoint": 0
+        },
+        {
+            "key": "field_shop_hero_mobile",
+            "label": "Hero Image (Mobile)",
+            "name": "shop_hero_mobile",
+            "type": "image",
+            "instructions": "Hero image for the main shop page (mobile). Recommended size: 768x200px",
+            "required": 0,
+            "conditional_logic": 0,
+            "return_format": "url",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "jpg,jpeg,png,webp"
+        },
+        {
+            "key": "field_shop_hero_desktop",
+            "label": "Hero Image (Desktop)",
+            "name": "shop_hero_desktop",
+            "type": "image",
+            "instructions": "Hero image for the main shop page (desktop). Recommended size: 1920x300px",
+            "required": 0,
+            "conditional_logic": 0,
+            "return_format": "url",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "jpg,jpeg,png,webp"
+        },
+        {
+            "key": "field_shop_hero_text",
+            "label": "Hero Text",
+            "name": "shop_hero_text",
+            "type": "textarea",
+            "instructions": "Italic quote text displayed over the hero image",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "Each piece carries a quiet prayer — unseen, but deeply felt.",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_shop_seo_tab",
+            "label": "Shop Page SEO",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "placement": "top",
+            "endpoint": 0
+        },
+        {
+            "key": "field_shop_seo_title",
+            "label": "SEO Title",
+            "name": "seo_title",
+            "type": "text",
+            "instructions": "Title for the SEO text block on the main shop page",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "Christian clothes in Ukraine",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_shop_seo_content",
+            "label": "SEO Content",
+            "name": "seo_content",
+            "type": "wysiwyg",
+            "instructions": "SEO text content with 'Show more' functionality",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "shop-settings"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Settings for the main shop page",
+    "show_in_rest": 0,
+    "modified": 1706400000
+}

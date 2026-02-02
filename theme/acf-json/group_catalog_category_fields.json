@@ -1,0 +1,127 @@
+{
+    "key": "group_catalog_category_fields",
+    "title": "Product Category Fields",
+    "fields": [
+        {
+            "key": "field_category_hero_tab",
+            "label": "Hero Section",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "placement": "top",
+            "endpoint": 0
+        },
+        {
+            "key": "field_category_hero_mobile",
+            "label": "Hero Image (Mobile)",
+            "name": "category_hero_mobile",
+            "type": "image",
+            "instructions": "Recommended size: 768x200px",
+            "required": 0,
+            "conditional_logic": 0,
+            "return_format": "url",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "jpg,jpeg,png,webp"
+        },
+        {
+            "key": "field_category_hero_desktop",
+            "label": "Hero Image (Desktop)",
+            "name": "category_hero_desktop",
+            "type": "image",
+            "instructions": "Recommended size: 1920x300px",
+            "required": 0,
+            "conditional_logic": 0,
+            "return_format": "url",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "jpg,jpeg,png,webp"
+        },
+        {
+            "key": "field_category_hero_text",
+            "label": "Hero Text",
+            "name": "category_hero_text",
+            "type": "textarea",
+            "instructions": "Italic quote text displayed over the hero image",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "Each piece carries a quiet prayer — unseen, but deeply felt.",
+            "maxlength": "",
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_category_seo_tab",
+            "label": "SEO Content",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "placement": "top",
+            "endpoint": 0
+        },
+        {
+            "key": "field_category_seo_title",
+            "label": "SEO Title",
+            "name": "seo_title",
+            "type": "text",
+            "instructions": "Title for the SEO text block",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "placeholder": "Christian T-shirts in Ukraine",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_category_seo_content",
+            "label": "SEO Content",
+            "name": "seo_content",
+            "type": "wysiwyg",
+            "instructions": "SEO text content with 'Show more' functionality",
+            "required": 0,
+            "conditional_logic": 0,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "taxonomy",
+                "operator": "==",
+                "value": "product_cat"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Custom fields for WooCommerce product categories",
+    "show_in_rest": 0,
+    "modified": 1706400000
+}

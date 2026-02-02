@@ -1,0 +1,144 @@
+/**
+ * Checkout Page Styles
+ */
+
+/* Checkout Inputs */
+.checkout-input,
+.checkout-select {
+	@apply transition-all duration-200;
+}
+
+.checkout-input:focus,
+.checkout-select:focus {
+	@apply outline-none ring-2 ring-[#3a3a3a] bg-white;
+}
+
+/* Custom Select Arrow */
+.checkout-select {
+	background-image: none;
+}
+
+/* Checkbox Styling */
+.checkout-checkbox {
+	@apply appearance-none bg-white border-2 border-gray-300 rounded cursor-pointer transition-all;
+}
+
+.checkout-checkbox:checked {
+	@apply bg-[#3a3a3a] border-[#3a3a3a];
+	background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+	background-size: 100% 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.checkout-checkbox:focus {
+	@apply ring-2 ring-[#3a3a3a] ring-offset-2;
+}
+
+/* Order Summary Card */
+.order-summary {
+	@apply shadow-sm;
+}
+
+/* Cart Item Hover */
+.cart-item {
+	@apply transition-all duration-200;
+}
+
+.cart-item:hover {
+	@apply bg-white/50 -mx-2 px-2 rounded-lg;
+}
+
+/* Quantity Controls */
+.quantity-controls button {
+	@apply transition-all duration-200;
+}
+
+.quantity-controls button:active {
+	@apply scale-95;
+}
+
+/* Remove Button */
+.remove-cart-item {
+	@apply transition-all duration-200;
+}
+
+.remove-cart-item:hover {
+	@apply scale-110;
+}
+
+/* Submit Button */
+#place-order-mobile,
+#place-order-desktop {
+	@apply transition-all duration-200;
+}
+
+#place-order-mobile:hover,
+#place-order-desktop:hover {
+	@apply transform -translate-y-0.5 shadow-lg;
+}
+
+#place-order-mobile:active,
+#place-order-desktop:active {
+	@apply transform translate-y-0 shadow-md;
+}
+
+/* Loading State */
+.checkout-form.loading {
+	@apply pointer-events-none opacity-60;
+}
+
+.checkout-form.loading button[type="submit"] {
+	@apply cursor-wait;
+}
+
+/* Form Validation */
+.checkout-input:invalid:not(:placeholder-shown),
+.checkout-select:invalid:not(:placeholder-shown) {
+	@apply ring-2 ring-red-400;
+}
+
+/* Sticky Order Summary */
+@media (min-width: 1024px) {
+	.order-summary {
+		position: sticky;
+		top: 2rem;
+	}
+}
+
+/* Success Page */
+.success-page {
+	@apply min-h-[60vh] flex items-center justify-center;
+}
+
+.success-icon {
+	@apply w-24 h-24 mx-auto mb-6 text-green-500;
+	animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+	0% {
+		transform: scale(0);
+		opacity: 0;
+	}
+	50% {
+		transform: scale(1.2);
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+/* Monobank Widget Styling */
+.monobank-widget-container {
+	@apply mt-4 p-4 bg-white rounded-lg border border-gray-200;
+}
+
+.monobank-payment-button {
+	@apply w-full py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2;
+}
+
+.monobank-payment-button img {
+	@apply h-6;
+}

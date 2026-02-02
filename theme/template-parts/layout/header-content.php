@@ -54,17 +54,15 @@ $cart_count   = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 						</a>
 					</div>
 
-					<!-- Cart Icon -->
-					<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="relative p-3 bg-[#4a4a4a] rounded-lg hover:bg-[#5a5a5a] transition-colors">
+					<!-- Cart Icon (Opens Mini Cart) -->
+					<button id="mini-cart-toggle-desktop" class="mini-cart-toggle relative p-3 bg-[#4a4a4a] rounded-lg hover:bg-[#5a5a5a] transition-colors" aria-label="<?php esc_attr_e( 'Open cart', 'allmighty' ); ?>">
 						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
 						</svg>
-						<?php if ( $cart_count > 0 ) : ?>
-							<span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-								<?php echo esc_html( $cart_count ); ?>
-							</span>
-						<?php endif; ?>
-					</a>
+						<span class="cart-count <?php echo $cart_count > 0 ? '' : 'hidden'; ?> absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+							<?php echo esc_html( $cart_count ); ?>
+						</span>
+					</button>
 
 					<!-- Phone Icon -->
 					<a href="tel:+1234567890" class="p-3 bg-[#4a4a4a] rounded-lg hover:bg-[#5a5a5a] transition-colors">
@@ -94,17 +92,15 @@ $cart_count   = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 						}
 						?>
 
-				<!-- Cart Icon -->
-				<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="relative p-3 bg-[#4a4a4a] rounded-lg hover:bg-[#5a5a5a] transition-colors">
+				<!-- Cart Icon (Opens Mini Cart) -->
+				<button id="mini-cart-toggle-mobile" class="mini-cart-toggle relative p-3 bg-[#4a4a4a] rounded-lg hover:bg-[#5a5a5a] transition-colors" aria-label="<?php esc_attr_e( 'Open cart', 'allmighty' ); ?>">
 					<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
 					</svg>
-					<?php if ( $cart_count > 0 ) : ?>
-						<span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-							<?php echo esc_html( $cart_count ); ?>
-						</span>
-					<?php endif; ?>
-				</a>
+					<span class="cart-count <?php echo $cart_count > 0 ? '' : 'hidden'; ?> absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+						<?php echo esc_html( $cart_count ); ?>
+					</span>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -160,3 +156,8 @@ $cart_count   = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 		</div>
 	</div>
 </header><!-- #masthead -->
+
+<?php
+// Include Mini Cart Drawer
+get_template_part( 'template-parts/components/mini-cart' );
+?>

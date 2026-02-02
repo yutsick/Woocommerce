@@ -1,0 +1,39 @@
+{
+    "key": "group_product_fields",
+    "title": "Product Extra Fields",
+    "fields": [
+        {
+            "key": "field_product_is_bestseller",
+            "label": "Bestseller",
+            "name": "is_bestseller",
+            "type": "true_false",
+            "instructions": "Mark this product as a bestseller to display a 'Bestseller' badge",
+            "required": 0,
+            "conditional_logic": 0,
+            "message": "",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "Yes",
+            "ui_off_text": "No"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "product"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "side",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Extra fields for WooCommerce products",
+    "show_in_rest": 0,
+    "modified": 1706400000
+}

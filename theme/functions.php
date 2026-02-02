@@ -235,6 +235,11 @@ require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 
 /**
+ * AJAX Shop Handler for products catalog.
+ */
+require get_template_directory() . '/inc/ajax-shop-handler.php';
+
+/**
  * Add WooCommerce support.
  */
 function allmighty_add_woocommerce_support() {
@@ -244,6 +249,87 @@ function allmighty_add_woocommerce_support() {
 	add_theme_support( 'wc-product-gallery-slider' );
 }
 add_action( 'after_setup_theme', 'allmighty_add_woocommerce_support' );
+
+/**
+ * Disable WooCommerce Blocks for cart and checkout (use classic templates).
+ */
+function allmighty_disable_wc_blocks_styles() {
+	if ( is_checkout() || is_cart() ) {
+		wp_dequeue_style( 'wc-blocks-style' );
+		wp_dequeue_style( 'wc-blocks-vendors-style' );
+		wp_dequeue_script( 'wc-blocks-checkout' );
+		wp_dequeue_script( 'wc-blocks-cart' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'allmighty_disable_wc_blocks_styles', 100 );
+
+/**
+ * Force classic checkout shortcode instead of Blocks checkout.
+ */
+function allmighty_force_classic_checkout( $content ) {
+	if ( is_checkout() && ! is_order_received_page() ) {
+		// Replace Blocks checkout with classic shortcode
+		if ( has_block( 'woocommerce/checkout', $content ) ) {
+			return '[woocommerce_checkout]';
+		}
+	}
+	return $content;
+}
+add_filter( 'the_content', 'allmighty_force_classic_checkout', 1 );
+
+/**
+ * Disable WooCommerce cart validation notice for variations.
+ */
+function allmighty_remove_cart_item_validation() {
+	remove_action( 'woocommerce_check_cart_items', 'wc_check_cart_items', 1 );
+}
+add_action( 'woocommerce_before_checkout_form', 'allmighty_remove_cart_item_validation', 1 );
+
+/**
+ * Redirect to home when cart is empty (instead of /cart).
+ */
+function allmighty_redirect_empty_cart() {
+	if ( is_cart() && WC()->cart->is_empty() ) {
+		wp_safe_redirect( home_url( '/' ) );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'allmighty_redirect_empty_cart' );
+
+/**
+ * Change empty cart redirect URL.
+ */
+function allmighty_empty_cart_redirect_url( $url ) {
+	return home_url( '/' );
+}
+add_filter( 'woocommerce_return_to_shop_redirect', 'allmighty_empty_cart_redirect_url' );
+
+/**
+ * Enqueue WooCommerce variation scripts on single product page.
+ */
+function allmighty_enqueue_variation_scripts() {
+	if ( is_product() ) {
+		wp_enqueue_script( 'wc-add-to-cart-variation' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'allmighty_enqueue_variation_scripts' );
+
+/**
+ * Use custom template for WooCommerce shop page.
+ *
+ * @param string $template The template path.
+ * @return string
+ */
+function allmighty_custom_shop_template( $template ) {
+	if ( is_shop() || is_product_category() ) {
+		$custom_template = get_template_directory() . '/page-shop.php';
+		if ( file_exists( $custom_template ) ) {
+			return $custom_template;
+		}
+	}
+	return $template;
+}
+add_filter( 'template_include', 'allmighty_custom_shop_template', 99 );
 
 /**
  * Helper function to render ACF flexible content blocks.
@@ -307,3 +393,356 @@ function allmighty_get_language_url( $lang_code ) {
 
 	return false;
 }
+
+/**
+ * WooCommerce: Modify product query for custom filters.
+ *
+ * @param WP_Query $query The main query.
+ */
+function allmighty_filter_products_query( $query ) {
+	if ( ! is_admin() && $query->is_main_query() && ( is_shop() || is_product_category() ) ) {
+		$tax_query = $query->get( 'tax_query' ) ?: array();
+
+		// Filter by product categories (custom filter, not the default product_cat)
+		if ( ! empty( $_GET['product_categories'] ) ) {
+			$categories = array_map( 'sanitize_text_field', (array) $_GET['product_categories'] );
+			$tax_query[] = array(
+				'taxonomy' => 'product_cat',
+				'field'    => 'slug',
+				'terms'    => $categories,
+				'operator' => 'IN',
+			);
+		}
+
+		// Filter by size attribute
+		if ( ! empty( $_GET['filter_size'] ) ) {
+			$sizes = array_map( 'sanitize_text_field', (array) $_GET['filter_size'] );
+			$tax_query[] = array(
+				'taxonomy' => 'pa_size',
+				'field'    => 'slug',
+				'terms'    => $sizes,
+				'operator' => 'IN',
+			);
+		}
+
+		// Filter by color attribute
+		if ( ! empty( $_GET['filter_color'] ) ) {
+			$colors = array_map( 'sanitize_text_field', (array) $_GET['filter_color'] );
+			$tax_query[] = array(
+				'taxonomy' => 'pa_color',
+				'field'    => 'slug',
+				'terms'    => $colors,
+				'operator' => 'IN',
+			);
+		}
+
+		if ( ! empty( $tax_query ) ) {
+			$tax_query['relation'] = 'AND';
+			$query->set( 'tax_query', $tax_query );
+		}
+	}
+}
+add_action( 'pre_get_posts', 'allmighty_filter_products_query' );
+
+/**
+ * WooCommerce: Set products per page.
+ *
+ * @param int $cols Number of products per page.
+ * @return int
+ */
+function allmighty_products_per_page( $cols ) {
+	return 12;
+}
+add_filter( 'loop_shop_per_page', 'allmighty_products_per_page' );
+
+/**
+ * Yoast SEO: Custom breadcrumb separator.
+ *
+ * @param string $separator The separator.
+ * @return string
+ */
+function allmighty_yoast_breadcrumb_separator( $separator ) {
+	return ' / ';
+}
+add_filter( 'wpseo_breadcrumb_separator', 'allmighty_yoast_breadcrumb_separator' );
+
+/**
+ * ACF: Add options page for shop settings.
+ */
+function allmighty_acf_options_page() {
+	if ( function_exists( 'acf_add_options_page' ) ) {
+		acf_add_options_page( array(
+			'page_title' => __( 'Shop Settings', 'allmighty' ),
+			'menu_title' => __( 'Shop Settings', 'allmighty' ),
+			'menu_slug'  => 'shop-settings',
+			'capability' => 'edit_posts',
+			'redirect'   => false,
+			'icon_url'   => 'dashicons-cart',
+			'position'   => 30,
+		) );
+	}
+}
+add_action( 'acf/init', 'allmighty_acf_options_page' );
+
+/**
+ * Fix product_cat array issue: WordPress expects a string, not an array.
+ * This handles URLs with product_cat[] from old filter forms.
+ *
+ * @param array $query_vars The query variables.
+ * @return array
+ */
+function allmighty_fix_product_cat_array( $query_vars ) {
+	if ( isset( $query_vars['product_cat'] ) && is_array( $query_vars['product_cat'] ) ) {
+		// Remove array value to prevent fatal error
+		unset( $query_vars['product_cat'] );
+	}
+	return $query_vars;
+}
+add_filter( 'request', 'allmighty_fix_product_cat_array', 1 );
+
+/**
+ * Enqueue cart/checkout scripts with AJAX data.
+ */
+function allmighty_cart_scripts() {
+	wp_localize_script( 'allmighty-script', 'allmightyAjax', array(
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'allmighty_checkout_nonce' ),
+	) );
+}
+add_action( 'wp_enqueue_scripts', 'allmighty_cart_scripts', 20 );
+
+/**
+ * AJAX: Update cart item quantity.
+ */
+function allmighty_update_cart_item() {
+	check_ajax_referer( 'allmighty_checkout_nonce', 'nonce' );
+
+	$cart_item_key = isset( $_POST['cart_item_key'] ) ? sanitize_text_field( $_POST['cart_item_key'] ) : '';
+	$quantity      = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 0;
+
+	if ( empty( $cart_item_key ) ) {
+		wp_send_json_error( array( 'message' => __( 'Invalid cart item.', 'allmighty' ) ) );
+	}
+
+	if ( $quantity === 0 ) {
+		// Remove item
+		WC()->cart->remove_cart_item( $cart_item_key );
+	} else {
+		// Update quantity
+		WC()->cart->set_quantity( $cart_item_key, $quantity );
+	}
+
+	// Recalculate totals
+	WC()->cart->calculate_totals();
+
+	wp_send_json_success( array(
+		'total'      => WC()->cart->get_total(),
+		'cart_count' => WC()->cart->get_cart_contents_count(),
+		'cart_empty' => WC()->cart->is_empty(),
+		'shop_url'   => home_url( '/' ),
+	) );
+}
+add_action( 'wp_ajax_allmighty_update_cart_item', 'allmighty_update_cart_item' );
+add_action( 'wp_ajax_nopriv_allmighty_update_cart_item', 'allmighty_update_cart_item' );
+
+/**
+ * AJAX add to cart handler.
+ */
+function allmighty_add_to_cart() {
+	check_ajax_referer( 'allmighty_checkout_nonce', 'nonce' );
+
+	$product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+	$quantity     = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
+	$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
+	$variation    = array();
+
+	if ( ! $product_id ) {
+		wp_send_json_error( array( 'message' => __( 'Invalid product.', 'allmighty' ) ) );
+	}
+
+	$product = wc_get_product( $product_id );
+
+	if ( ! $product ) {
+		wp_send_json_error( array( 'message' => __( 'Product not found.', 'allmighty' ) ) );
+	}
+
+	// Handle variable products - get variation attributes from POST data
+	if ( $product->is_type( 'variable' ) && $variation_id ) {
+		foreach ( $_POST as $key => $value ) {
+			if ( strpos( $key, 'attribute_' ) === 0 ) {
+				$variation[ sanitize_title( $key ) ] = sanitize_text_field( $value );
+			}
+		}
+	}
+
+	// Add to cart
+	$cart_item_key = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation );
+
+	if ( $cart_item_key ) {
+		// Get updated mini cart HTML
+		ob_start();
+		$cart_items = WC()->cart->get_cart();
+		if ( ! empty( $cart_items ) ) :
+			echo '<div class="space-y-6">';
+			foreach ( $cart_items as $item_key => $cart_item ) :
+				$item_product = $cart_item['data'];
+				$item_qty     = $cart_item['quantity'];
+				$price        = WC()->cart->get_product_price( $item_product );
+				$thumbnail    = get_the_post_thumbnail_url( $cart_item['product_id'], 'thumbnail' );
+				$variation_data = array();
+				if ( ! empty( $cart_item['variation'] ) ) {
+					foreach ( $cart_item['variation'] as $attr => $value ) {
+						$attr_name = str_replace( 'attribute_pa_', '', $attr );
+						$attr_name = str_replace( 'attribute_', '', $attr_name );
+						$variation_data[ ucfirst( $attr_name ) ] = ucfirst( $value );
+					}
+				}
+				?>
+				<div class="mini-cart-item flex gap-4" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+					<div class="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+						<?php if ( $thumbnail ) : ?>
+							<img src="<?php echo esc_url( $thumbnail ); ?>" alt="<?php echo esc_attr( $item_product->get_name() ); ?>" class="w-full h-full object-cover">
+						<?php else : ?>
+							<div class="w-full h-full bg-gray-200 flex items-center justify-center">
+								<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+								</svg>
+							</div>
+						<?php endif; ?>
+					</div>
+					<div class="flex-1">
+						<div class="flex justify-between items-start">
+							<h3 class="font-bold text-[#3a3a3a] leading-tight">"<?php echo esc_html( $item_product->get_name() ); ?>"</h3>
+							<button type="button" class="mini-cart-remove text-red-400 hover:text-red-600 transition-colors p-1" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+								</svg>
+							</button>
+						</div>
+						<div class="text-[#3a3a3a] font-medium mt-1"><?php echo wp_kses_post( $price ); ?></div>
+						<?php if ( ! empty( $variation_data ) ) : ?>
+							<div class="text-sm text-gray-500 mt-1">
+								<?php echo esc_html( implode( '   ', array_map( fn( $k, $v ) => "$k: $v", array_keys( $variation_data ), $variation_data ) ) ); ?>
+							</div>
+						<?php endif; ?>
+						<div class="mini-cart-quantity flex items-center gap-1 mt-3">
+							<button type="button" class="mini-cart-minus w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+							</button>
+							<span class="mini-cart-qty-value w-10 h-10 flex items-center justify-center bg-gray-100 text-[#3a3a3a] font-medium"><?php echo esc_html( $item_qty ); ?></span>
+							<button type="button" class="mini-cart-plus w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors" data-cart-item-key="<?php echo esc_attr( $item_key ); ?>">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+							</button>
+						</div>
+					</div>
+				</div>
+				<?php
+			endforeach;
+			echo '</div>';
+		endif;
+		$mini_cart_html = ob_get_clean();
+
+		wp_send_json_success( array(
+			'cart_count'     => WC()->cart->get_cart_contents_count(),
+			'cart_total'     => WC()->cart->get_total(),
+			'mini_cart_html' => $mini_cart_html,
+		) );
+	} else {
+		wp_send_json_error( array( 'message' => __( 'Could not add to cart.', 'allmighty' ) ) );
+	}
+}
+add_action( 'wp_ajax_allmighty_add_to_cart', 'allmighty_add_to_cart' );
+add_action( 'wp_ajax_nopriv_allmighty_add_to_cart', 'allmighty_add_to_cart' );
+
+/**
+ * Custom checkout field processing.
+ */
+function allmighty_checkout_process() {
+	// Validate required fields
+	if ( empty( $_POST['billing_name'] ) ) {
+		wc_add_notice( __( 'Please enter your full name.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['billing_phone'] ) ) {
+		wc_add_notice( __( 'Please enter your phone number.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['shipping_city'] ) ) {
+		wc_add_notice( __( 'Please enter your delivery city.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['shipping_address'] ) ) {
+		wc_add_notice( __( 'Please enter your delivery address.', 'allmighty' ), 'error' );
+	}
+
+	if ( empty( $_POST['privacy_agreement'] ) ) {
+		wc_add_notice( __( 'Please agree to the personal data processing.', 'allmighty' ), 'error' );
+	}
+}
+add_action( 'woocommerce_checkout_process', 'allmighty_checkout_process' );
+
+/**
+ * Save custom checkout fields to order.
+ *
+ * @param int $order_id The order ID.
+ */
+function allmighty_checkout_update_order_meta( $order_id ) {
+	$order = wc_get_order( $order_id );
+
+	if ( ! empty( $_POST['billing_name'] ) ) {
+		$order->update_meta_data( '_billing_full_name', sanitize_text_field( $_POST['billing_name'] ) );
+		// Split name for WooCommerce compatibility
+		$name_parts = explode( ' ', sanitize_text_field( $_POST['billing_name'] ), 2 );
+		$order->set_billing_first_name( $name_parts[0] );
+		$order->set_billing_last_name( isset( $name_parts[1] ) ? $name_parts[1] : '' );
+	}
+
+	if ( ! empty( $_POST['billing_phone'] ) ) {
+		$order->set_billing_phone( sanitize_text_field( $_POST['billing_phone'] ) );
+	}
+
+	if ( ! empty( $_POST['billing_email'] ) ) {
+		$order->set_billing_email( sanitize_email( $_POST['billing_email'] ) );
+	}
+
+	if ( ! empty( $_POST['shipping_city'] ) ) {
+		$order->set_shipping_city( sanitize_text_field( $_POST['shipping_city'] ) );
+		$order->set_billing_city( sanitize_text_field( $_POST['shipping_city'] ) );
+	}
+
+	if ( ! empty( $_POST['shipping_method'] ) ) {
+		$order->update_meta_data( '_shipping_method_custom', sanitize_text_field( $_POST['shipping_method'] ) );
+	}
+
+	if ( ! empty( $_POST['shipping_address'] ) ) {
+		$order->set_shipping_address_1( sanitize_text_field( $_POST['shipping_address'] ) );
+		$order->set_billing_address_1( sanitize_text_field( $_POST['shipping_address'] ) );
+	}
+
+	if ( ! empty( $_POST['no_callback'] ) ) {
+		$order->update_meta_data( '_no_callback', 'yes' );
+	}
+
+	$order->save();
+}
+add_action( 'woocommerce_checkout_update_order_meta', 'allmighty_checkout_update_order_meta' );
+
+/**
+ * Redirect to Monobank payment if online payment selected.
+ *
+ * @param int    $order_id The order ID.
+ * @param array  $posted_data Posted data.
+ * @param object $order The order object.
+ */
+function allmighty_process_monobank_payment( $order_id, $posted_data, $order ) {
+	$payment_method = isset( $_POST['payment_method'] ) ? sanitize_text_field( $_POST['payment_method'] ) : '';
+
+	if ( $payment_method === 'online' ) {
+		// Set payment method to Monobank if available
+		if ( class_exists( 'WC_Gateway_Monobank' ) || in_array( 'monobank', array_keys( WC()->payment_gateways()->get_available_payment_gateways() ) ) ) {
+			$order->set_payment_method( 'monobank' );
+			$order->save();
+		}
+	}
+}
+add_action( 'woocommerce_checkout_order_processed', 'allmighty_process_monobank_payment', 10, 3 );

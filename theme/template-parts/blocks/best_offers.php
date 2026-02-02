@@ -59,11 +59,11 @@ if ( empty( $products ) ) {
 
 		<!-- Desktop Grid -->
 		<div class="hidden lg:grid lg:grid-cols-3 gap-8">
-	
+
 			<?php foreach ( $products as $product_item ) : ?>
 				<?php
-			
-				$p_id = is_numeric( $product_item ) ? $product_item : $product_item->ID;					
+
+				$p_id = is_numeric( $product_item ) ? $product_item : $product_item->ID;
 
 				$product = wc_get_product( $p_id );
 				if ( ! is_a( $product, 'WC_Product' ) ) {
@@ -73,7 +73,7 @@ if ( empty( $products ) ) {
 				<div class="product-card group">
 					<!-- Product Image -->
 					<div class="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
-						<a href="<?php echo esc_url( $product->get_permalink() ); ?>" class="block">
+						<a href="<?php echo esc_url( $product->get_permalink() ); ?>" class="block h-full">
 							<?php if ( $product->get_image_id() ) : ?>
 								<?php echo wp_get_attachment_image( $product->get_image_id(), 'woocommerce_thumbnail', false, array( 'class' => 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300' ) ); ?>
 							<?php else : ?>
@@ -82,28 +82,33 @@ if ( empty( $products ) ) {
 								     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
 							<?php endif; ?>
 						</a>
+
+						<!-- Hover Overlay with Price & Button -->
+						<div class="product-hover-overlay absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+							<div class="flex items-center justify-between">
+								<!-- Price -->
+								<div class="text-xl font-bold text-white">
+									<?php echo $product->get_price_html(); ?>
+								</div>
+
+								<!-- Add to Cart Button -->
+								<a href="<?php echo esc_url( $product->add_to_cart_url() ); ?>"
+								   data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+								   class="inline-block bg-white text-[#3a3a3a] px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors ajax_add_to_cart add_to_cart_button"
+								   data-quantity="1">
+									<?php echo esc_html( $product->add_to_cart_text() ); ?>
+								</a>
+							</div>
+						</div>
 					</div>
 
-					<!-- Product Info -->
+					<!-- Product Name -->
 					<div class="text-center">
-						<h3 class="text-xl font-semibold text-[#2a2a2a] mb-2">
+						<h3 class="text-xl font-semibold text-[#2a2a2a]">
 							<a href="<?php echo esc_url( $product->get_permalink() ); ?>" class="hover:text-[#4a4a4a] transition-colors">
 								<?php echo esc_html( $product->get_name() ); ?>
 							</a>
 						</h3>
-
-						<!-- Price -->
-						<div class="text-2xl font-bold text-[#3a3a3a] mb-4">
-							<?php echo $product->get_price_html(); ?>
-						</div>
-
-						<!-- Add to Cart Button -->
-						<a href="<?php echo esc_url( $product->add_to_cart_url() ); ?>"
-						   data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
-						   class="inline-block bg-[#3a3a3a] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#2a2a2a] transition-colors ajax_add_to_cart add_to_cart_button"
-						   data-quantity="1">
-							<?php echo esc_html( $product->add_to_cart_text() ); ?>
-						</a>
 					</div>
 				</div>
 			<?php endforeach; ?>

@@ -17,7 +17,7 @@ $cart_count = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 
 <!-- Mini Cart Drawer -->
 <div id="mini-cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] shadow-2xl">
-	<div class="flex flex-col h-full">
+	<div class="flex flex-col h-full"> 
 		<!-- Header -->
 		<div class="flex items-center justify-between p-6 border-b border-gray-200">
 			<h2 class="text-2xl font-bold text-[#3a3a3a]"><?php esc_html_e( 'Cart', 'allmighty' ); ?></h2>
@@ -147,3 +147,4 @@ $cart_count = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
 		<?php endif; ?>
 	</div>
 </div>
+

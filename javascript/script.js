@@ -357,10 +357,10 @@ document.addEventListener('DOMContentLoaded', function () {
 							setTimeout(() => cartItem.remove(), 300);
 						}
 
-						// Show empty cart message if cart is empty
+						// Redirect to home if cart is empty
 						if (data.data.cart_empty) {
 							setTimeout(() => {
-								location.reload();
+								window.location.href = data.data.shop_url || '/';
 							}, 300);
 						}
 					}
@@ -374,42 +374,36 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
-		// Mini Cart Quantity Controls
-		const miniCartMinusButtons = miniCartDrawer.querySelectorAll('.mini-cart-minus');
-		const miniCartPlusButtons = miniCartDrawer.querySelectorAll('.mini-cart-plus');
-		const miniCartRemoveButtons = miniCartDrawer.querySelectorAll('.mini-cart-remove');
+		// Mini Cart Quantity Controls (Event Delegation)
+		miniCartDrawer.addEventListener('click', function (e) {
+			const minusBtn = e.target.closest('.mini-cart-minus');
+			const plusBtn = e.target.closest('.mini-cart-plus');
+			const removeBtn = e.target.closest('.mini-cart-remove');
 
-		miniCartMinusButtons.forEach((button) => {
-			button.addEventListener('click', function () {
-				const cartItemKey = this.dataset.cartItemKey;
-				const quantityEl = this.parentElement.querySelector('.mini-cart-qty-value');
+			if (minusBtn) {
+				const cartItemKey = minusBtn.dataset.cartItemKey;
+				const quantityEl = minusBtn.parentElement.querySelector('.mini-cart-qty-value');
 				let quantity = parseInt(quantityEl.textContent, 10);
 
 				if (quantity > 1) {
 					quantity--;
 					quantityEl.textContent = quantity;
 					updateMiniCartItem(cartItemKey, quantity);
+				} else {
+					updateMiniCartItem(cartItemKey, 0);
 				}
-			});
-		});
-
-		miniCartPlusButtons.forEach((button) => {
-			button.addEventListener('click', function () {
-				const cartItemKey = this.dataset.cartItemKey;
-				const quantityEl = this.parentElement.querySelector('.mini-cart-qty-value');
+			} else if (plusBtn) {
+				const cartItemKey = plusBtn.dataset.cartItemKey;
+				const quantityEl = plusBtn.parentElement.querySelector('.mini-cart-qty-value');
 				let quantity = parseInt(quantityEl.textContent, 10);
 
 				quantity++;
 				quantityEl.textContent = quantity;
 				updateMiniCartItem(cartItemKey, quantity);
-			});
-		});
-
-		miniCartRemoveButtons.forEach((button) => {
-			button.addEventListener('click', function () {
-				const cartItemKey = this.dataset.cartItemKey;
+			} else if (removeBtn) {
+				const cartItemKey = removeBtn.dataset.cartItemKey;
 				updateMiniCartItem(cartItemKey, 0);
-			});
+			}
 		});
 
 		// Make openMiniCart available globally for add-to-cart events

@@ -132,20 +132,10 @@ $product_id = $product->get_id();
                                 <input type="hidden" name="add-to-cart" value="<?php echo absint( $product->get_id() ); ?>">
                                 <input type="hidden" name="product_id" value="<?php echo absint( $product->get_id() ); ?>">
                                 <input type="hidden" name="variation_id" class="variation_id" value="0">
-                                <div class="flex items-center gap-4">
-                                    <?php
-                                    woocommerce_quantity_input(
-                                        array(
-                                            'min_value'   => apply_filters( 'woocommerce_quantity_input_min', $product->get_min_purchase_quantity(), $product ),
-                                            'max_value'   => apply_filters( 'woocommerce_quantity_input_max', $product->get_max_purchase_quantity(), $product ),
-                                            'input_value' => isset( $_POST['quantity'] ) ? wc_stock_amount( wp_unslash( $_POST['quantity'] ) ) : $product->get_min_purchase_quantity(),
-                                        )
-                                    );
-                                    ?>
-                                    <button type="submit" class="single_add_to_cart_button button alt bg-white text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                                        Add to cart
-                                    </button>
-                                </div>
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="single_add_to_cart_button bg-gray-300 text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-500 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    Add to cart
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -163,7 +153,7 @@ $product_id = $product->get_id();
                                 )
                             );
                             ?>
-                            <button type="submit" name="add-to-cart" value="<?php echo esc_attr( $product->get_id() ); ?>" class="single_add_to_cart_button button alt bg-white text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition">
+                            <button type="submit" name="add-to-cart" value="<?php echo esc_attr( $product->get_id() ); ?>" class="single_add_to_cart_button  bg-gray-300 text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-500 transition">
                                 Add to cart
                             </button>
                         </div>
@@ -246,65 +236,151 @@ button.active{
     border-width: 3px;
 }
 
+/* Hide variation availability message */
+.woocommerce-variation-availability {
+    display: none !important;
+}
+
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Color selection
-    const colorOptions = document.querySelectorAll('.color-option');
-    colorOptions.forEach(option => {
-        option.addEventListener('click', function(e) {
-            e.preventDefault();
-            const container = this.closest('[data-attribute]');
-            const attribute = container.dataset.attribute;
-            const value = this.dataset.value;
-            const select = document.querySelector(`select[name="attribute_${attribute}"]`);
-            
-            // Remove active class from siblings
-            container.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
-            
-            // Add active class
-            this.classList.add('active');
-            
-            // Update hidden select
-            if (select) {
-                select.value = value;
-                select.dispatchEvent(new Event('change'));
-            }
-        });
-    });
-    
-    // Size selection
-    const sizeOptions = document.querySelectorAll('.size-option');
-    sizeOptions.forEach(option => {
-        option.addEventListener('click', function(e) {
-            e.preventDefault();
-            const container = this.closest('[data-attribute]');
-            const attribute = container.dataset.attribute;
-            const value = this.dataset.value;
-            const select = document.querySelector(`select[name="attribute_${attribute}"]`);
-            
-            // Remove active class from siblings
-            container.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('active'));
-            
-            // Add active class
-            this.classList.add('active');
-            
-            // Update hidden select
-            if (select) {
-                select.value = value;
-                select.dispatchEvent(new Event('change'));
-            }
-        });
-    });
-    
+jQuery(function($) {
+    var $form = $('.variations_form');
+
     // Initialize WooCommerce variations
-    if (typeof jQuery !== 'undefined') {
-        jQuery('.variations_form').wc_variation_form();
+    if ($form.length) {
+        $form.wc_variation_form();
     }
-    
+
+    // Get variations data
+    var variations = $form.data('product_variations');
+
+    // Function to find matching variation
+    function findMatchingVariation() {
+        var selectedAttrs = {};
+        $form.find('select').each(function() {
+            var name = $(this).attr('name');
+            var val = $(this).val();
+            if (name && val) {
+                selectedAttrs[name] = val;
+            }
+        });
+
+        // Find matching variation
+        for (var i = 0; i < variations.length; i++) {
+            var variation = variations[i];
+            var isMatch = true;
+
+            for (var attrName in variation.attributes) {
+                var attrVal = variation.attributes[attrName];
+                var selectedVal = selectedAttrs[attrName] || '';
+
+                // Empty means "any" - always matches
+                if (attrVal !== '' && attrVal !== selectedVal) {
+                    isMatch = false;
+                    break;
+                }
+            }
+
+            if (isMatch) {
+                return variation;
+            }
+        }
+
+        return null;
+    }
+
+    // Function to check if all options are selected
+    function allOptionsSelected() {
+        var allSelected = true;
+        $form.find('select').each(function() {
+            if (!$(this).val()) {
+                allSelected = false;
+                return false;
+            }
+        });
+        return allSelected;
+    }
+
+    // Function to apply variation
+    function applyVariation() {
+        var variation = findMatchingVariation();
+        var $button = $form.find('.single_add_to_cart_button');
+
+        if (variation && allOptionsSelected()) {
+            // Set variation_id
+            $form.find('.variation_id').val(variation.variation_id);
+
+            // Enable button
+            $button.removeClass('disabled wc-variation-selection-needed');
+            $button.removeAttr('disabled');
+            $button.text('Add to cart');
+
+            // Trigger WooCommerce event
+            $form.trigger('found_variation', [variation]);
+        } else {
+            // Disable button
+            $button.addClass('disabled wc-variation-selection-needed');
+            $button.attr('disabled', 'disabled');
+
+            $form.find('.variation_id').val(0);
+        }
+    }
+
+    // Color selection
+    $('.color-option').on('click', function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        var $container = $this.closest('[data-attribute]');
+        var attribute = $container.data('attribute');
+        var value = $this.data('value');
+
+        var $select = $form.find('select[name="attribute_' + attribute + '"]');
+
+        // Remove active class from siblings
+        $container.find('.color-option').removeClass('active');
+        $this.addClass('active');
+
+        // Update hidden select and trigger change for WooCommerce
+        if ($select.length) {
+            $select.val(value).trigger('change');
+            applyVariation();
+        }
+    });
+
+    // Size selection
+    $('.size-option').on('click', function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        var $container = $this.closest('[data-attribute]');
+        var attribute = $container.data('attribute');
+        var value = $this.data('value');
+
+        var $select = $form.find('select[name="attribute_' + attribute + '"]');
+
+        // Remove active class from siblings
+        $container.find('.size-option').removeClass('active');
+        $this.addClass('active');
+
+        // Update hidden select and trigger change for WooCommerce
+        if ($select.length) {
+            $select.val(value).trigger('change');
+            applyVariation();
+        }
+    });
+
+    // Listen for WooCommerce events
+    $form.on('found_variation', function(event, variation) {
+        $('.single_add_to_cart_button').removeClass('disabled').prop('disabled', false);
+        $form.find('.variation_id').val(variation.variation_id);
+    });
+
+    $form.on('reset_data', function() {
+        $('.single_add_to_cart_button').addClass('disabled').prop('disabled', true);
+    });
+
     // Swiper for related products
-    if (window.innerWidth < 1024) {
+    if (window.innerWidth < 1024 && typeof Swiper !== 'undefined') {
         new Swiper('.related-swiper', {
             slidesPerView: 1.2,
             spaceBetween: 20,

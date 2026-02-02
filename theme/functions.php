@@ -251,6 +251,60 @@ function allmighty_add_woocommerce_support() {
 add_action( 'after_setup_theme', 'allmighty_add_woocommerce_support' );
 
 /**
+ * Disable WooCommerce Blocks for cart and checkout (use classic templates).
+ */
+function allmighty_disable_wc_blocks_styles() {
+	if ( is_checkout() || is_cart() ) {
+		wp_dequeue_style( 'wc-blocks-style' );
+		wp_dequeue_style( 'wc-blocks-vendors-style' );
+		wp_dequeue_script( 'wc-blocks-checkout' );
+		wp_dequeue_script( 'wc-blocks-cart' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'allmighty_disable_wc_blocks_styles', 100 );
+
+/**
+ * Force classic checkout shortcode instead of Blocks checkout.
+ */
+function allmighty_force_classic_checkout( $content ) {
+	if ( is_checkout() && ! is_order_received_page() ) {
+		// Replace Blocks checkout with classic shortcode
+		if ( has_block( 'woocommerce/checkout', $content ) ) {
+			return '[woocommerce_checkout]';
+		}
+	}
+	return $content;
+}
+add_filter( 'the_content', 'allmighty_force_classic_checkout', 1 );
+
+/**
+ * Disable WooCommerce cart validation notice for variations.
+ */
+function allmighty_remove_cart_item_validation() {
+	remove_action( 'woocommerce_check_cart_items', 'wc_check_cart_items', 1 );
+}
+add_action( 'woocommerce_before_checkout_form', 'allmighty_remove_cart_item_validation', 1 );
+
+/**
+ * Redirect to home when cart is empty (instead of /cart).
+ */
+function allmighty_redirect_empty_cart() {
+	if ( is_cart() && WC()->cart->is_empty() ) {
+		wp_safe_redirect( home_url( '/' ) );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'allmighty_redirect_empty_cart' );
+
+/**
+ * Change empty cart redirect URL.
+ */
+function allmighty_empty_cart_redirect_url( $url ) {
+	return home_url( '/' );
+}
+add_filter( 'woocommerce_return_to_shop_redirect', 'allmighty_empty_cart_redirect_url' );
+
+/**
  * Enqueue WooCommerce variation scripts on single product page.
  */
 function allmighty_enqueue_variation_scripts() {
@@ -485,7 +539,7 @@ function allmighty_update_cart_item() {
 		'total'      => WC()->cart->get_total(),
 		'cart_count' => WC()->cart->get_cart_contents_count(),
 		'cart_empty' => WC()->cart->is_empty(),
-		'shop_url'   => wc_get_page_permalink( 'shop' ),
+		'shop_url'   => home_url( '/' ),
 	) );
 }
 add_action( 'wp_ajax_allmighty_update_cart_item', 'allmighty_update_cart_item' );
@@ -497,8 +551,10 @@ add_action( 'wp_ajax_nopriv_allmighty_update_cart_item', 'allmighty_update_cart_
 function allmighty_add_to_cart() {
 	check_ajax_referer( 'allmighty_checkout_nonce', 'nonce' );
 
-	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
-	$quantity   = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
+	$product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+	$quantity     = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
+	$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
+	$variation    = array();
 
 	if ( ! $product_id ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid product.', 'allmighty' ) ) );
@@ -510,8 +566,17 @@ function allmighty_add_to_cart() {
 		wp_send_json_error( array( 'message' => __( 'Product not found.', 'allmighty' ) ) );
 	}
 
+	// Handle variable products - get variation attributes from POST data
+	if ( $product->is_type( 'variable' ) && $variation_id ) {
+		foreach ( $_POST as $key => $value ) {
+			if ( strpos( $key, 'attribute_' ) === 0 ) {
+				$variation[ sanitize_title( $key ) ] = sanitize_text_field( $value );
+			}
+		}
+	}
+
 	// Add to cart
-	$cart_item_key = WC()->cart->add_to_cart( $product_id, $quantity );
+	$cart_item_key = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation );
 
 	if ( $cart_item_key ) {
 		// Get updated mini cart HTML

@@ -26,14 +26,30 @@ $shipping_methods = array(
 	'self_pickup' => __( 'Self pickup', 'allmighty' ),
 );
 
-// Payment methods
-$payment_methods = array(
-	'online'          => __( 'Online payment', 'allmighty' ),
-	'cash_on_delivery' => __( 'Cash on delivery', 'allmighty' ),
-);
+// Get available payment gateways from WooCommerce
+$available_gateways = WC()->payment_gateways->get_available_payment_gateways();
+$payment_methods = array();
+foreach ( $available_gateways as $gateway_id => $gateway ) {
+	$payment_methods[ $gateway_id ] = $gateway->get_title();
+}
 
-do_action( 'woocommerce_before_checkout_form', $checkout );
+// Remove coupon form from checkout
+remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
+
+// Only output notices, not other elements
+wc_print_notices();
 ?>
+
+<style>
+/* Hide unwanted checkout elements */
+.woocommerce-form-coupon-toggle,
+.checkout_coupon,
+[class*="monobank"],
+[id*="monobank"],
+.woocommerce-info:has(a[href*="coupon"]) {
+	display: none !important;
+}
+</style>
 
 <!-- Breadcrumbs -->
 <section class="breadcrumbs-section bg-white">
@@ -55,7 +71,7 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 </section>
 
 <!-- Checkout Content -->
-<section class="checkout-section py-8 lg:py-12 bg-white">
+<section class="checkout-section py-8 lg:py-12 bg-white ">
 	<div class="container mx-auto px-4">
 		<form id="checkout-form" class="checkout-form" method="post" action="<?php echo esc_url( wc_get_checkout_url() ); ?>">
 			<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
@@ -102,11 +118,12 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 							<!-- Email -->
 							<div class="form-group">
 								<label for="billing_email" class="block text-sm text-[#3a3a3a] mb-2">
-									<?php esc_html_e( 'E-mail', 'allmighty' ); ?>
+									<?php esc_html_e( 'E-mail', 'allmighty' ); ?> <span class="text-red-500">*</span>
 								</label>
 								<input type="email"
 								       id="billing_email"
 								       name="billing_email"
+								       required
 								       placeholder="<?php esc_attr_e( 'E-mail', 'allmighty' ); ?>"
 								       class="checkout-input w-full px-4 py-3 bg-gray-100 border-0 rounded-lg text-[#3a3a3a] placeholder-gray-400 focus:ring-2 focus:ring-[#3a3a3a] focus:bg-white transition-all">
 							</div>
@@ -120,6 +137,32 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 						</h2>
 
 						<div class="space-y-4">
+							<!-- Region -->
+							<div class="form-group">
+								<label for="billing_state" class="block text-sm text-[#3a3a3a] mb-2">
+									<?php esc_html_e( 'Region', 'allmighty' ); ?> <span class="text-red-500">*</span>
+								</label>
+								<div class="relative">
+									<select id="billing_state"
+									        name="billing_state"
+									        required
+									        class="checkout-select w-full px-4 py-3 bg-gray-100 border-0 rounded-lg text-[#3a3a3a] appearance-none cursor-pointer focus:ring-2 focus:ring-[#3a3a3a] focus:bg-white transition-all">
+										<option value=""><?php esc_html_e( 'Select region', 'allmighty' ); ?></option>
+										<?php
+										$ua_states = WC()->countries->get_states( 'UA' );
+										if ( $ua_states ) {
+											foreach ( $ua_states as $code => $name ) {
+												echo '<option value="' . esc_attr( $code ) . '">' . esc_html( $name ) . '</option>';
+											}
+										}
+										?>
+									</select>
+									<svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+									</svg>
+								</div>
+							</div>
+
 							<!-- City -->
 							<div class="form-group">
 								<label for="shipping_city" class="block text-sm text-[#3a3a3a] mb-2">
@@ -229,12 +272,27 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 					<div class="lg:hidden mt-8">
 						<button type="submit"
 						        id="place-order-mobile"
+						        name="woocommerce_checkout_place_order"
+						        value="1"
 						        class="w-full py-4 bg-[#3a3a3a] text-white font-medium rounded-lg hover:bg-[#4a4a4a] transition-colors">
 							<?php esc_html_e( 'Place order', 'allmighty' ); ?>
 						</button>
 					</div>
 
 					<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
+					<input type="hidden" name="billing_country" value="UA">
+					<input type="hidden" name="shipping_country" value="UA">
+					<input type="hidden" name="billing_first_name" id="billing_first_name" value="">
+					<input type="hidden" name="billing_last_name" id="billing_last_name" value=".">
+					<input type="hidden" name="billing_city" id="billing_city_hidden" value="">
+					<input type="hidden" name="billing_address_1" id="billing_address_1" value="">
+					<input type="hidden" name="billing_postcode" value="00000">
+					<input type="hidden" name="shipping_first_name" id="shipping_first_name" value="">
+					<input type="hidden" name="shipping_last_name" value=".">
+					<input type="hidden" name="shipping_city" id="shipping_city_hidden" value="">
+					<input type="hidden" name="shipping_address_1" id="shipping_address_1" value="">
+					<input type="hidden" name="shipping_state" id="shipping_state_hidden" value="">
+					<input type="hidden" name="shipping_postcode" value="00000">
 				</div>
 
 				<!-- Right Column - Order Summary -->
@@ -339,6 +397,8 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 						<div class="hidden lg:block">
 							<button type="submit"
 							        id="place-order-desktop"
+							        name="woocommerce_checkout_place_order"
+							        value="1"
 							        class="w-full py-4 bg-[#3a3a3a] text-white font-medium rounded-lg hover:bg-[#4a4a4a] transition-colors">
 								<?php esc_html_e( 'Place order', 'allmighty' ); ?>
 							</button>
@@ -361,5 +421,46 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 		</form>
 	</div>
 </section>
+<?php echo do_shortcode('[mono_checkout]'); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	const form = document.getElementById('checkout-form');
+	if (!form) return;
+
+	form.addEventListener('submit', function(e) {
+		// Copy billing_name to first_name/last_name
+		const billingName = document.getElementById('billing_name');
+		if (billingName && billingName.value) {
+			const nameParts = billingName.value.trim().split(' ');
+			const firstName = nameParts[0] || '.';
+			const lastName = nameParts.slice(1).join(' ') || '.';
+			document.getElementById('billing_first_name').value = firstName;
+			document.getElementById('billing_last_name').value = lastName;
+			document.getElementById('shipping_first_name').value = firstName;
+		}
+
+		// Copy region/state
+		const state = document.getElementById('billing_state');
+		if (state && state.value) {
+			document.getElementById('shipping_state_hidden').value = state.value;
+		}
+
+		// Copy city
+		const city = document.getElementById('shipping_city');
+		if (city && city.value) {
+			document.getElementById('billing_city_hidden').value = city.value;
+			document.getElementById('shipping_city_hidden').value = city.value;
+		}
+
+		// Copy address
+		const address = document.getElementById('shipping_address');
+		if (address && address.value) {
+			document.getElementById('billing_address_1').value = address.value;
+			document.getElementById('shipping_address_1').value = address.value;
+		}
+	});
+});
+</script>
 
 <?php do_action( 'woocommerce_after_checkout_form', $checkout ); ?>

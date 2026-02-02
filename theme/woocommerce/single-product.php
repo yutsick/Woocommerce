@@ -104,14 +104,18 @@ $product_id = $product->get_id();
                                     <label class="block text-xl font-semibold e mb-4">Size</label>
                                     <div class="flex gap-3" data-attribute="<?php echo esc_attr( $sanitized_name ); ?>">
                                         <?php foreach ( $options as $option ) : ?>
-                                            <button type="button" 
+                                            <button type="button"
                                                     class="size-option bg-white text-black px-6 py-3 rounded-lg border-2  hover:bg-gray-100 transition cursor-pointer font-semibold text-lg min-w-[80px]"
                                                     data-value="<?php echo esc_attr( $option ); ?>">
                                                 <?php echo esc_html( $option ); ?>
                                             </button>
                                         <?php endforeach; ?>
                                     </div>
-                                    <select name="attribute_<?php echo esc_attr( $sanitized_name ); ?>" 
+                                    <!-- Size Guide Link -->
+                                    <a href="#" id="size-guide-trigger" class="inline-block mt-3 text-[#6b7280] text-sm underline hover:text-[#3a3a3a] transition-colors">
+                                        <?php esc_html_e( 'Size guide', 'allmighty' ); ?>
+                                    </a>
+                                    <select name="attribute_<?php echo esc_attr( $sanitized_name ); ?>"
                                             id="attribute_<?php echo esc_attr( $sanitized_name ); ?>"
                                             class="hidden"
                                             data-attribute_name="attribute_<?php echo esc_attr( $sanitized_name ); ?>">
@@ -389,5 +393,10 @@ jQuery(function($) {
     }
 });
 </script>
+
+<?php
+// Include Size Guide Modal
+get_template_part( 'template-parts/components/size-guide' );
+?>
 
 <?php get_footer(); ?>

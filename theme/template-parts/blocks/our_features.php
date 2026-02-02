@@ -2,10 +2,12 @@
 /**
  * Block: Our Features
  *
- * Flexible block with optional header intro, main content (image + bullets), and optional footer CTA.
+ * Flexible block with layout variants: header only, footer only, or both.
  *
  * ACF Fields:
- * - Header Section (optional):
+ * - layout_variant (Select) - with_header / with_footer / both
+ *
+ * - Header Section:
  *   - header_icon (Image) - Mission icon
  *   - header_text (Textarea) - Primary intro text
  *   - header_text_secondary (Textarea) - Secondary intro text
@@ -19,11 +21,14 @@
  *     - text (Text) - Bullet text
  *   - closing_text (Textarea) - Closing paragraph
  *
- * - Footer Section (optional):
+ * - Footer Section:
  *   - footer_text (Textarea) - Footer message
  *   - footer_button_text (Text) - CTA button text
  *   - footer_button_link (Link) - CTA button URL
  */
+
+// Layout variant
+$layout_variant = get_sub_field( 'layout_variant' ) ?: 'with_header';
 
 // Header fields
 $header_icon           = get_sub_field( 'header_icon' );
@@ -48,15 +53,16 @@ $image_url       = $image ? esc_url( $image['url'] ) : 'https://placehold.co/600
 $title           = $title ?: '';
 $subtitle        = $subtitle ?: '';
 
-$has_header = $header_icon_url || $header_text || $header_text_secondary;
-$has_footer = $footer_text || $footer_button_text;
+// Show header/footer based on variant
+$show_header = in_array( $layout_variant, array( 'with_header', 'both' ), true );
+$show_footer = in_array( $layout_variant, array( 'with_footer', 'both' ), true );
 ?>
 
 <section class="our-features-section py-16 lg:py-24 bg-white">
 	<div class="container mx-auto px-4">
 		<div class="max-w-[91.666667%] mx-auto">
 
-			<?php if ( $has_header ) : ?>
+			<?php if ( $show_header ) : ?>
 			<!-- Header Intro -->
 			<div class="text-center mb-16 lg:mb-24">
 				<?php if ( $header_icon_url ) : ?>
@@ -130,7 +136,7 @@ $has_footer = $footer_text || $footer_button_text;
 				</div>
 			</div>
 
-			<?php if ( $has_footer ) : ?>
+			<?php if ( $show_footer ) : ?>
 			<!-- Footer CTA -->
 			<div class="text-center mt-16 lg:mt-24">
 				<?php if ( $footer_text ) : ?>

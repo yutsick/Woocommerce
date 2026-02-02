@@ -75,9 +75,14 @@ $is_logo = !empty($args['is_logo']) ? $args['is_logo'] : false;
 			<!-- Right: Logo -->
 			 <?php if ($is_logo) { ?>
 				<div class="lg:w-1/3 flex justify-end">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
+					<?php 
+						if ( function_exists( 'the_custom_logo' ) ) {
+							the_custom_logo();
+						}
+						?>
+					<!-- <a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
 						<img src="https://placehold.co/150x100/3a3a3a/ffffff?text=LOGO" alt="<?php bloginfo( 'name' ); ?>" class="h-20 w-auto">
-					</a>
+					</a> -->
 				</div>
 			<?php } ?>
 		</div>

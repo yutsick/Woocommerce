@@ -23,6 +23,9 @@ $button_text      = get_sub_field( 'button_text' );
 $button_link      = get_sub_field( 'button_link' );
 $image            = get_sub_field( 'image' );
 $image_position   = get_sub_field( 'image_position' );
+$is_bg_image   = get_sub_field( 'is_bg_image' );
+$bg_image   = get_sub_field( 'bg_image' );
+$is_top   = get_sub_field( 'is_top' );
 
 // Default values
 $background_color = $background_color ?: '#3a3a3a';
@@ -40,71 +43,76 @@ if ( $image ) {
 }
 ?>
 
-<section class="accent-block py-16 lg:py-0" style="background-color: <?php echo esc_attr( $background_color ); ?>;">
-	<div class="container mx-auto px-4 lg:px-0">
-		<!-- Desktop Layout -->
-		<div class="hidden lg:flex lg:items-center <?php echo 'left' === $image_position ? 'lg:flex-row-reverse' : ''; ?>">
-			<!-- Text Content -->
-			<div class="lg:w-1/2 lg:py-24 <?php echo 'left' === $image_position ? 'lg:pr-16' : 'lg:pl-16'; ?>">
-				<h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">
-					<?php echo esc_html( $title ); ?>
-				</h2>
+<section class="accent-block py-16 lg:py-0 relative" style="background-color: <?php echo esc_attr( $background_color ); ?>;">
+	
+	<!-- Desktop Layout -->
+	<div class="hidden lg:flex justify-end">
 
-				<div class="text-white text-lg lg:text-xl leading-relaxed space-y-4 mb-8">
-					<?php echo wpautop( $content ); ?>
-				</div>
+		<?php if ( $image_url ) : ?>
+			<img src="<?php echo esc_url( $image_url ); ?>"
+			     alt="<?php echo esc_attr( $title ); ?>"
+			     class="h-[500px] object-cover <?php echo 'left' === $image_position ? 'object-left' : 'object-right'; ?>">
+		<?php endif; ?>
+		
+		<div class="absolute inset-0">
+			<div class="container mx-auto h-full flex <?php echo 'left' === $image_position ? 'flex-row-reverse' : ''; ?>">
 
-				<?php if ( $show_button ) : ?>
-					<a href="<?php echo esc_url( $button_link ); ?>"
-					   class="inline-block bg-white text-[#2a2a2a] px-12 py-4 rounded-lg text-lg font-medium hover:bg-gray-100 transition-colors">
-						<?php echo esc_html( $button_text ); ?>
-					</a>
-				<?php endif; ?>
-			</div>
+				<div class="w-1/2 <?php echo 'left' === $image_position ? 'pr-16' : 'pl-16'; ?>">
+					<h2 class="font-bold text-white mb-6 <?php echo ($is_top) ? 'lg:text-[64px] text-[40px]' : 'lg:text-[32px] text-[24px]'; ?>">
+						<?php echo esc_html( $title ); ?>
+					</h2>
 
-			<!-- Image -->
-			<?php if ( $image_url ) : ?>
-				<div class="lg:w-1/2 relative">
-					<div class="aspect-[16/9] lg:aspect-auto lg:h-[500px]">
-						<img src="<?php echo esc_url( $image_url ); ?>"
-						     alt="<?php echo esc_attr( $title ); ?>"
-						     class="w-full h-full object-cover">
+					<div class="text-white text-lg lg:text-xl leading-relaxed space-y-4 mb-8">
+						<?php echo wpautop( $content ); ?>
 					</div>
+
+					<?php if ( $show_button ) : ?>
+						<a href="<?php echo esc_url( $button_link ); ?>"
+						   class="inline-block bg-white text-[#2a2a2a] px-12 py-4 rounded-lg text-lg font-medium hover:bg-gray-100 transition-colors">
+							<?php echo esc_html( $button_text ); ?>
+						</a>
+					<?php endif; ?>
 				</div>
-			<?php endif; ?>
-		</div>
 
-		<!-- Mobile Layout -->
-		<div class="lg:hidden">
-			<!-- Text Content -->
-			<div class="mb-8">
-				<h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">
-					<?php echo esc_html( $title ); ?>
-				</h2>
-
-				<div class="text-white text-base leading-relaxed space-y-4">
-					<?php echo wpautop( $content ); ?>
+				<div class="w-1/2 h-full flex items-center">
+					<?php if($is_bg_image){ ?>
+						<img src="<?= $bg_image?>" alt="" class="w-full h-full py-4 object-cover">
+					<?php } ?>
 				</div>
 			</div>
-
-			<!-- Button (Mobile - Full Width) -->
-			<?php if ( $show_button ) : ?>
-				<a href="<?php echo esc_url( $button_link ); ?>"
-				   class="block w-full text-center bg-white text-[#2a2a2a] px-8 py-4 rounded-lg text-base font-medium hover:bg-gray-100 transition-colors mb-8">
-					<?php echo esc_html( $button_text ); ?>
-				</a>
-			<?php endif; ?>
-
-			<!-- Image -->
-			<?php if ( $image_url ) : ?>
-				<div class="relative -mx-4">
-					<div class="aspect-[4/3]">
-						<img src="<?php echo esc_url( $image_url ); ?>"
-						     alt="<?php echo esc_attr( $title ); ?>"
-						     class="w-full h-full object-cover">
-					</div>
-				</div>
-			<?php endif; ?>
 		</div>
+	</div>
+
+	<!-- Mobile Layout -->
+	<div class="lg:hidden container mx-auto px-4">
+		<!-- Text Content -->
+		<div class="mb-8">
+			<h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">
+				<?php echo esc_html( $title ); ?>
+			</h2>
+
+			<div class="text-white text-base leading-relaxed space-y-4">
+				<?php echo wpautop( $content ); ?>
+			</div>
+		</div>
+
+		<!-- Button (Mobile - Full Width) -->
+		<?php if ( $show_button ) : ?>
+			<a href="<?php echo esc_url( $button_link ); ?>"
+			   class="block w-full text-center bg-white text-[#2a2a2a] px-8 py-4 rounded-lg text-base font-medium hover:bg-gray-100 transition-colors mb-8">
+				<?php echo esc_html( $button_text ); ?>
+			</a>
+		<?php endif; ?>
+
+		<!-- Image -->
+		<?php if ( $image_url ) : ?>
+			<div class="relative -mx-4">
+				<div class="aspect-[4/3]">
+					<img src="<?php echo esc_url( $image_url ); ?>"
+					     alt="<?php echo esc_attr( $title ); ?>"
+					     class="w-full h-full object-cover">
+				</div>
+			</div>
+		<?php endif; ?>
 	</div>
 </section>

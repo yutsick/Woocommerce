@@ -48,7 +48,7 @@ $footer_button_text = get_sub_field( 'footer_button_text' );
 $footer_button_link = get_sub_field( 'footer_button_link' );
 
 // Process values
-$header_icon_url = $header_icon ? esc_url( $header_icon['url'] ) : '';
+$header_icon_url = $header_icon ;
 $image_url       = $image ? esc_url( $image['url'] ) : 'https://placehold.co/600x500/cccccc/666666?text=Feature+Image';
 $title           = $title ?: '';
 $subtitle        = $subtitle ?: '';
@@ -60,14 +60,13 @@ $show_footer = in_array( $layout_variant, array( 'with_footer', 'both' ), true )
 
 <section class="our-features-section py-16 lg:py-24 bg-white">
 	<div class="container mx-auto px-4">
-		<div class="max-w-[91.666667%] mx-auto">
-
+		<div class="max-w-11/12 ">
 			<?php if ( $show_header ) : ?>
 			<!-- Header Intro -->
 			<div class="text-center mb-16 lg:mb-24">
-				<?php if ( $header_icon_url ) : ?>
+				<?php if ( $header_icon ) : ?>
 					<div class="mb-6">
-						<img src="<?php echo $header_icon_url; ?>" alt="Mission icon" class="w-12 h-12 mx-auto">
+						<img src="<?php echo $header_icon; ?>" alt="Mission icon" class="w-12 h-12 mx-auto">
 					</div>
 				<?php endif; ?>
 
@@ -86,7 +85,7 @@ $show_footer = in_array( $layout_variant, array( 'with_footer', 'both' ), true )
 			<?php endif; ?>
 
 			<!-- Main Content -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 ">
 				<!-- Image -->
 				<div class="order-1">
 					<img src="<?php echo $image_url; ?>"
@@ -97,7 +96,7 @@ $show_footer = in_array( $layout_variant, array( 'with_footer', 'both' ), true )
 				<!-- Content -->
 				<div class="order-2">
 					<?php if ( $title ) : ?>
-						<h2 class="text-3xl lg:text-4xl font-bold text-[#3a3a3a] mb-4">
+						<h2 class="lg:mt-0 text-[24px] lg:text-[32px] font-bold text-[#3a3a3a] mb-4">
 							<?php echo esc_html( $title ); ?>
 						</h2>
 					<?php endif; ?>
@@ -130,7 +129,7 @@ $show_footer = in_array( $layout_variant, array( 'with_footer', 'both' ), true )
 
 					<?php if ( $closing_text ) : ?>
 						<p class="text-[#4a4a4a] text-base lg:text-lg leading-relaxed">
-							<?php echo esc_html( $closing_text ); ?>
+							<?php echo  $closing_text ; ?>
 						</p>
 					<?php endif; ?>
 				</div>
@@ -141,7 +140,7 @@ $show_footer = in_array( $layout_variant, array( 'with_footer', 'both' ), true )
 			<div class="text-center mt-16 lg:mt-24">
 				<?php if ( $footer_text ) : ?>
 					<p class="text-xl lg:text-2xl font-bold text-[#3a3a3a] leading-relaxed max-w-3xl mx-auto mb-8">
-						<?php echo nl2br( esc_html( $footer_text ) ); ?>
+						<?php echo $footer_text ; ?>
 					</p>
 				<?php endif; ?>
 
